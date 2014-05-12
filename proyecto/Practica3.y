@@ -56,9 +56,18 @@ parametro: STRING STRING ','
 parametros: parametros parametro
 	| parametro
 	;
+	
+relleno_metodo: relleno_metodo STRING
+	| relleno_metodo STRING ';'
+	| STRING
+	| STRING ';'
+	//| /*Metodo vacio*/
+	;
 
-metodos: m_visibilidad STRING STRING '(' parametros ')' '{' {printf("%s %s %s (){",$1,$2,$3);}
-	| m_visibilidad STRING STRING '(' ')' '{' {printf("%s %s %s (){",$1,$2,$3);}
+metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {printf("%s %s %s (){",$1,$2,$3);}
+	| m_visibilidad STRING STRING '(' ')' '{' relleno_metodo '}' {printf("%s %s %s (){",$1,$2,$3);}
+	| m_visibilidad STRING STRING '(' parametros ')' '{' '}' {printf("%s %s %s (){",$1,$2,$3);}
+	| m_visibilidad STRING STRING '(' ')' '{' '}' {printf("%s %s %s (){",$1,$2,$3);}
 	; 
 
 %%
@@ -66,6 +75,7 @@ int main(){
 	const char extension[6] = ".java";
 	char **pathArchivos;
 	pathArchivos = obtenerPathFicheros(extension);
+	printf("1-> %s",pathArchivos[0]);
 	FILE *f;
 	//hacer while de pathArvhivos
 	f = fopen(pathArchivos[0],"r");

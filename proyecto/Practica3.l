@@ -18,6 +18,7 @@ private {return PRIVATE;}
 protected {return PROTECTED;}
 
 
+
 class {return CLASS;}
 \{ {return '{';}
 \} {return '}';}
