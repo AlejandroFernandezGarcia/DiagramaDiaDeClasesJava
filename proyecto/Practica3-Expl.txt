@@ -1,1 +1,7 @@
-Errores:
+El código debe ser compilable sin errores.
+
+La llave debe ir en la linea de la firma del método sino se considera error.
+
+Cada clase en un fichero.
+
+Para hacer algun tipo de gestión de errores se ha acotado algunas cosas

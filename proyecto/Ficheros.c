@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
+#include "Ficheros.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -32,9 +33,8 @@ int contarFicheros(char const *directorio,char const *extension){
 	return contador;
 }
 
-char **obtenerPathFicheros(){
+char **obtenerPathFicheros(const char *extension){
 	// /home/alejandro/NetBeansProjects/ER-12-04/src/interfazUsuario/escritorio
-	const char extension[6] = ".java";
 	char **pathArchivos;
 	int numArchivos=0;
 	int archivoActual=0;
@@ -53,7 +53,7 @@ char **obtenerPathFicheros(){
 		//strcat(aux,directorio);
 		sprintf(aux,"%s/%s",aux,directorio);
 		strcpy(directorio,aux);
-		printf("%s\n",directorio);
+		//printf("%s\n",directorio);
 		free(aux);
 		dir=opendir(directorio);
 	}
@@ -63,19 +63,23 @@ char **obtenerPathFicheros(){
 	}else{
 		//printf(" no Error\n");
 		numArchivos = contarFicheros(directorio,extension);
-		pathArchivos = malloc(numArchivos*sizeof(char*));
+		pathArchivos = (char**) malloc(numArchivos*sizeof(char*)+1);
 		ldir = readdir(dir);
 		while(ldir != NULL){
-			comprobarExtension(ldir->d_name,extension);
-			pathArchivos[archivoActual] = malloc(strlen(ldir->d_name)*sizeof(char));
-			strcpy(pathArchivos[archivoActual],ldir->d_name);
-			archivoActual++;
+			if(comprobarExtension(ldir->d_name,extension)){
+				pathArchivos[archivoActual] = (char*) malloc(200*sizeof(char));
+				strcpy(pathArchivos[archivoActual],ldir->d_name);
+				archivoActual++;
+			}
 			ldir = readdir(dir);
 		}
+		pathArchivos[numArchivos+1] = NULL;//?
 	}
 	if(closedir(dir)==-1){
 		printf("Error closedir\n");
 	}
 	//hacer frees
 	free(directorio);
+	
+	return pathArchivos;
 }

@@ -1,1 +1,1 @@
-char **obtenerPathFicheros();
+char **obtenerPathFicheros(const char *extension);
