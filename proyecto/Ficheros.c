@@ -68,7 +68,8 @@ char **obtenerPathFicheros(const char *extension){
 		while(ldir != NULL){
 			if(comprobarExtension(ldir->d_name,extension)){
 				pathArchivos[archivoActual] = (char*) malloc(200*sizeof(char));
-				strcpy(pathArchivos[archivoActual],ldir->d_name);
+				sprintf(pathArchivos[archivoActual],"%s/%s",directorio,ldir->d_name);
+				//strcpy(pathArchivos[archivoActual],ldir->d_name);
 				archivoActual++;
 			}
 			ldir = readdir(dir);
