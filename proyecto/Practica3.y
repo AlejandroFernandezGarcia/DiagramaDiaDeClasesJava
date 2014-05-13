@@ -74,13 +74,18 @@ metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {
 int main(){
 	const char extension[6] = ".java";
 	char **pathArchivos;
+	int i=0;
 	pathArchivos = obtenerPathFicheros(extension);
-	printf("1-> %s",pathArchivos[0]);
 	FILE *f;
 	//hacer while de pathArvhivos
-	f = fopen(pathArchivos[0],"r");
-	yyin= f;
-	yyparse();
+	while(pathArchivos[i] != NULL){
+		printf("\n%d-> %s\n",i,pathArchivos[i]);
+		f = fopen(pathArchivos[i],"r");
+		yyin= f;
+		yyparse();
+		i++;
+	}
+	fclose(f);
 	printf("\n");
 	return 0;
 }

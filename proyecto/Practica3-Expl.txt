@@ -7,3 +7,5 @@ Los métodos no pueden tener declaración de métodos dentro.
 Cada clase en un fichero.
 
 Para hacer algun tipo de gestión de errores se ha acotado algunas cosas
+
+Plantillas
