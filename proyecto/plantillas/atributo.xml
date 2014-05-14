@@ -1,9 +1,9 @@
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#SegundoAtributo#</dia:string>
+            <!--<dia:string>#NombreAtributo#</dia:string>-->
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#TipoSegundoAtributo#</dia:string>
+            <!--<dia:string>#TipoSegundoAtributo#</dia:string>-->
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -12,7 +12,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
-            <dia:enum val="0"/>
+            <!--<dia:enum val="0"/>Privacidad-->
           </dia:attribute>
           <dia:attribute name="abstract">
             <dia:boolean val="false"/>
