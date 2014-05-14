@@ -1,6 +1,6 @@
             <dia:composite type="umlparameter">
               <dia:attribute name="name">
-                <!--<dia:string>#ParametroMetodo#</dia:string>-->
+                <!--<dia:string>#NombreParametro#</dia:string>-->
               </dia:attribute>
               <dia:attribute name="type">
                 <!--<dia:string>#TipoParametro#</dia:string>-->

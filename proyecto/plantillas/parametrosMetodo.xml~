@@ -1,9 +1,9 @@
             <dia:composite type="umlparameter">
               <dia:attribute name="name">
-                <dia:string>#Parametro2#</dia:string>
+                <!--<dia:string>#NomreParametro#</dia:string>-->
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#TipoParametro2#</dia:string>
+                <!--<dia:string>#TipoParametro#</dia:string>-->
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>

@@ -15,5 +15,14 @@ struct tatributo {
 
 typedef struct tatributo atributo;
 
+struct tparametro {
+	char *nombre;
+	char *tipo;
+};
+typedef struct tparametro parametro;
+
+
+
 atributo* crearAtributo(char *nombre, char *tipo, int visibilidad);
+parametro* crearParametro(char *nombre, char *tipo);
 
