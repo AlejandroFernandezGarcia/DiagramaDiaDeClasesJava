@@ -28,8 +28,21 @@ struct tmetodo {
 };
 typedef struct tmetodo metodo;
 
+struct tclase {
+	char *nombre;
+};
+typedef struct tclase clase;
+
 
 atributo* crearAtributo(char *nombre, char *tipo, int visibilidad);
 parametro* crearParametro(char *nombre, char *tipo);
 metodo* crearMetodo(char *nombre,char *tipo, int visibilidad);
+clase* creaClase(char *nombre);
 
+
+void crearMetodoXML(metodo **lMet);
+void crearParametrosXML(parametro ***lPar);
+void crearAtributosXML(atributo **lAt);
+void crearClaseXML(clase *clase,int numeroClase);
+void crearLayerXML(int numeroTotalDeClases);
+void crearFinalXML(char *path, char *nombre);
