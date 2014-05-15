@@ -1,12 +1,10 @@
 #include "Xml.h"
+#include <unistd.h>
 
 #define TRUE 1
 #define FALSE 0
 
 #define TAM_MAX 10//20 es lo suficientemente grande?
-
-
-//faltan metodos de inicializacion de las estructuras
 
 atributo* crearAtributo(char *nombre, char *tipo,int visibilidad){
 	atributo *at;
@@ -43,6 +41,159 @@ metodo* crearMetodo(char *nombre,char *tipo, int visibilidad){
 	return met; 
 }
 
+clase* crearClase(char *nombre){/*Hace falta puntero¿?¿?*/
+	clase *clase;
+	clase = malloc(sizeof(clase));
+	clase->nombre = malloc(sizeof(char)*200);
+	
+	strcpy(clase->nombre,nombre);
+	return clase;
+}
+
+void copiarFicheroAtributos(FILE *resultado){
+	FILE *f;
+	char *linea,*aux;
+	linea = malloc (200*sizeof(char));
+	f = fopen("tmp/atributos.xml","r");
+	aux = fgets(linea,200,f);
+	while(aux != NULL){
+		fputs(linea,resultado);
+		aux = fgets(linea,200,f);
+	}
+	fclose(f);
+	free(linea);
+}
+
+void copiarFicheroMetodo(FILE *resultado){
+	FILE *f;
+	char *linea,*aux;
+	linea = malloc (200*sizeof(char));
+	f = fopen("tmp/metodo.xml","r");
+	aux = fgets(linea,200,f);
+	while(aux != NULL){
+		fputs(linea,resultado);
+		aux = fgets(linea,200,f);
+	}
+	fclose(f);
+	free(linea);
+}
+
+void copiarFicheroLayer(FILE *resultado){
+	FILE *f;
+	char *linea,*aux;
+	linea = malloc (200*sizeof(char));
+	f = fopen("tmp/layer.xml","r");
+	aux = fgets(linea,200,f);
+	while(aux != NULL){
+		fputs(linea,resultado);
+		aux = fgets(linea,200,f);
+	}
+	fclose(f);
+	free(linea);
+}
+
+void crearFinalXML(char *path, char *nombre){
+	FILE *f;
+	FILE *resultado;
+	char *aux, *linea;
+	aux = malloc (sizeof(char)*200);
+	linea = malloc (sizeof(char)*200);
+	if((path[strlen(path)-1]) == '/'){
+		sprintf(aux,"%s%s",path,nombre);
+	}else{
+		sprintf(aux,"%s/%s",path,nombre);
+	}
+	resultado = fopen(aux, "w");
+	f = fopen("plantillas/estructuraPrincipal.xml","r");
+	free(aux);
+	if(resultado==NULL){
+		free(aux);
+		printf("El directorio de salida no existe");
+		exit(1);
+	}
+	aux = fgets(linea,200,f);
+	while(aux != NULL){
+		if(strstr(linea,"<!--Aqui el layer de clases-->") != NULL){
+			copiarFicheroLayer(resultado);
+			fputs("\n",resultado);
+		}else{
+			fputs(linea,resultado);
+		}
+		aux = fgets(linea,200,f);
+	}
+	fclose(f);
+	fclose(resultado);
+	free(linea);
+}
+
+void crearLayerXML(int numeroTotalDeClases){
+	FILE *f;
+	FILE *resultado;
+	int ficheroActual=0;
+	char *aux,*linea;
+	linea = malloc (sizeof(char)*200);
+	aux = malloc (sizeof(char)*200);
+	resultado=fopen("tmp/layer.xml","w");
+	sprintf(aux,"%s%c%s%c%s%c%s%c%s%c%s%c%s\n","  <dia:layer name=",'"',"Fondo",'"',
+	" visible=",'"',"true",'"'," active=",'"',"true",'"',">");
+	fputs(aux,resultado);
+	free(aux);
+	while(ficheroActual < numeroTotalDeClases){
+		aux = malloc (sizeof(char)*200);
+		sprintf(aux,"%s%d%s","tmp/clase",ficheroActual,".xml");
+		f=fopen(aux,"r");
+		free(aux);
+		aux = fgets(linea,200,f);
+		while(aux != NULL){
+			fputs(linea,resultado);
+			aux = fgets(linea,200,f);
+		}
+		ficheroActual++;
+	}
+	fputs("  </dia:layer>",resultado);
+	fclose(f);
+	fclose(resultado);
+	free(linea);
+}
+
+//faltaria escoger la posicion en la que tiene que aparecer
+//solo haria falta meter en la estructura la posicion y cambiar la plantilla
+void crearClaseXML(clase *clase,int numeroClase){
+	FILE *f;
+	FILE *resultado;
+	f=fopen("plantillas/clase.xml","r");
+	char *linea,*aux;
+	linea = malloc (200*sizeof(char));
+	aux = malloc(200*sizeof(char));
+	sprintf(aux,"%s%d%s","tmp/clase",numeroClase,".xml");
+	resultado=fopen(aux,"w");
+	free(aux);
+	if((f==NULL)||(resultado==NULL)){
+		printf("No existen la plantilla/No se ha podido crear el resultado\n");
+		free(aux);
+		free(linea);
+		exit(1);
+	}
+	aux = fgets(linea,200,f);
+	while(aux != NULL){
+		if(strstr(linea,"<!--<dia:string>#NombreClase#</dia:string>-->")!=NULL){//nombre
+			sprintf(linea,"%s%s%s\n","        <dia:string>#",clase->nombre,"#</dia:string>");
+			fputs(linea,resultado);
+		}else if(strstr(linea,"Combinado de atributos")!=NULL){//copiar fichero atributos
+			copiarFicheroAtributos(resultado);
+			fputs("\n",resultado);
+		}else if(strstr(linea,"Combinado de metodos")!=NULL){//copiar fichero metodos ¿petara por los espacios?
+			copiarFicheroMetodo(resultado);
+			fputs("\n",resultado);
+		}else{
+			fputs(linea,resultado);
+		}
+		aux = fgets(linea,200,f);
+	}
+	free(linea);
+	fclose(f);
+	fclose(resultado);
+}
 
 void crearAtributosXML(atributo **lAt){
 	int i=0;
@@ -153,7 +304,7 @@ void copiarFicherosParametros(FILE *resultado, int numFichero){
 		fputs(linea,resultado);
 		aux = fgets(linea,200,par);
 	}
-	
+	fputs("\n",resultado);
 	fclose(par);
 	free(linea);
 }
@@ -212,14 +363,14 @@ void crearMetodoXML(metodo **lMet){
 
 
 void liberarMetodos(metodo **met){
-	/*int i=0;
+	int i=0;
 	while(met[i]!=NULL){
 		free(met[i]->nombre);
 		free(met[i]->tipo);
 		free(met[i]);
 		i++;
 	}
-	free(met);*/
+	free(met);
 }
 
 
@@ -263,7 +414,6 @@ int main(){
 	at[1] = crearAtributo("Nombre2","tipo2",PRIVATE);
 	crearAtributosXML(at);
 	
-	liberarAtributos(at);
 	
 	parametro ***par;
 	par = (parametro ***) malloc(TAM_MAX*sizeof(parametro**));
@@ -287,10 +437,10 @@ int main(){
 	par[1][1] = crearParametro("Nombre2","tipo3");
 	crearParametrosXML(par);
 	
-	liberarParametros(par);
 	
 	metodo** met;
 	met = (metodo **) malloc(TAM_MAX*sizeof(metodo*));
+	i=0;
 	while(i<TAM_MAX){
 		met[i] = NULL;
 		i++;
@@ -301,12 +451,24 @@ int main(){
 	//met[1] = NULL;
 	crearMetodoXML(met);
 	
+	
+	clase *c;
+	c = crearClase("PrimeraClase");
+	crearClaseXML(c,0);
+	
+	free(c->nombre);
+	free(c);
+	liberarParametros(par);
+	liberarAtributos(at);
 	liberarMetodos(met);
+	
+	crearLayerXML(1);
+	crearFinalXML(".", "Diagrama.dia");
 	
 	//if(at[49] == NULL){printf("SIII");}
 	//fopen("calabacin.txt","wb"); asi lo creo en caso de que no exista
 	//sleep(5);
 	printf("--->Done.\n");
-	//system("rm -fR tmp");
+	system("rm -fR tmp");
 	return 0;
 }

@@ -101,11 +101,8 @@
       <dia:attribute name="comment_font_height">
         <dia:real val="0.69999999999999996"/>
       </dia:attribute>
-      
       <!--<dia:attribute name="attributes">Combinado de atributos</dia:attribute>-->
-      
       <!--<dia:attribute name="operations">Combinado de metodos</dia:attribute>-->
-      
       <dia:attribute name="template">
         <dia:boolean val="false"/>
       </dia:attribute>
