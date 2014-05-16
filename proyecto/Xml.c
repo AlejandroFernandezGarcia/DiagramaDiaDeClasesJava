@@ -99,9 +99,9 @@ void crearFinalXML(char *path, char *nombre){
 	aux = malloc (sizeof(char)*200);
 	linea = malloc (sizeof(char)*200);
 	if((path[strlen(path)-1]) == '/'){
-		sprintf(aux,"%s%s",path,nombre);
+		sprintf(aux,"%s%s%s",path,nombre,".dia");
 	}else{
-		sprintf(aux,"%s/%s",path,nombre);
+		sprintf(aux,"%s/%s%s",path,nombre,".dia");
 	}
 	resultado = fopen(aux, "w");
 	f = fopen("plantillas/estructuraPrincipal.xml","r");
@@ -298,7 +298,6 @@ void copiarFicherosParametros(FILE *resultado, int numFichero){
 	sprintf(aux,"%s%d%s","tmp/parametros",numFichero,".xml");
 	par = fopen(aux,"r");
 	free(aux);
-	printf("%d-",numFichero);
 	aux = fgets(linea,200,par);
 	while(aux != NULL){
 		fputs(linea,resultado);
@@ -401,26 +400,21 @@ void liberarAtributos(atributo **at){
 	free(at);
 }
 
-int main(){
-	//system("mkdir tmp");
-	int i=0,j=0;	
+atributo** inicializarAtributos(){
+	int i=0;
 	atributo** at;
 	at = (atributo **) malloc(TAM_MAX*sizeof(atributo*));
 	while(i<TAM_MAX){
 		at[i] = NULL;
 		i++;
 	}
-	at[0] = crearAtributo("Nombre1","tipo1",PUBLIC);
-	at[1] = crearAtributo("Nombre2","tipo2",PRIVATE);
-	crearAtributosXML(at);
-	
-	
+	return at;
+}
+
+parametro*** inicializarParametro(){
+	int i=0,j=0;
 	parametro ***par;
 	par = (parametro ***) malloc(TAM_MAX*sizeof(parametro**));
-	
-	//par[0] = (parametro **) malloc(TAM_MAX*sizeof(parametro*));
-	//par[1] = (parametro **) malloc(TAM_MAX*sizeof(parametro*));
-	i=0,j=0;
 	while(i<TAM_MAX){
 		par[i] = (parametro **) malloc(TAM_MAX*sizeof(parametro*));
 		while(j<TAM_MAX){
@@ -430,31 +424,45 @@ int main(){
 		i++;
 		j=0;
 	}
-	
-	par[0][0] = crearParametro("Nombre1","tipo1");
-	par[0][1] = crearParametro("Nombre2","tipo2");
-	par[1][0] = crearParametro("Nombre1","tipo1");
-	par[1][1] = crearParametro("Nombre2","tipo3");
-	crearParametrosXML(par);
-	
-	
+	return par;
+}
+
+
+metodo** inicializarMetodo(){
+	int i=0;	
 	metodo** met;
 	met = (metodo **) malloc(TAM_MAX*sizeof(metodo*));
-	i=0;
 	while(i<TAM_MAX){
 		met[i] = NULL;
 		i++;
 	}
+	return met;
+}
+
+/*int main(){
+	system("mkdir tmp");
 	
+	atributo** at = inicializarAtributos();
+	parametro ***par = inicializarParametro();
+	metodo** met = inicializarMetodo();
+	
+	at[0] = crearAtributo("Nombre1","tipo1",PUBLIC);
+	at[1] = crearAtributo("Nombre2","tipo2",PRIVATE);
+	par[0][0] = crearParametro("Nombre1","tipo1");
+	par[0][1] = crearParametro("Nombre2","tipo2");
+	par[1][0] = crearParametro("Nombre1","tipo1");
+	par[1][1] = crearParametro("Nombre2","tipo3");
 	met[0] = crearMetodo("Nombre1","tipo1",PUBLIC);
 	met[1] = crearMetodo("Nombre2","tipo2",PRIVATE);
-	//met[1] = NULL;
-	crearMetodoXML(met);
-	
 	
 	clase *c;
 	c = crearClase("PrimeraClase");
+	
+	crearAtributosXML(at);
+	crearParametrosXML(par);
+	crearMetodoXML(met);
 	crearClaseXML(c,0);
+	
 	
 	free(c->nombre);
 	free(c);
@@ -463,12 +471,9 @@ int main(){
 	liberarMetodos(met);
 	
 	crearLayerXML(1);
-	crearFinalXML(".", "Diagrama.dia");
+	crearFinalXML(".", "Diagrama");
 	
-	//if(at[49] == NULL){printf("SIII");}
-	//fopen("calabacin.txt","wb"); asi lo creo en caso de que no exista
-	//sleep(5);
 	printf("--->Done.\n");
 	system("rm -fR tmp");
 	return 0;
-}
+}*/

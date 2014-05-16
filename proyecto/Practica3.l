@@ -25,6 +25,7 @@ class {return CLASS;}
 \; {return ';';}
 \( {return '(';}
 \) {return ')';}
+\, {return ',';}
 
 {string}	{
 	p=(char*) malloc(sizeof(char)*strlen(yytext));
