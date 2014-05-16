@@ -4,7 +4,7 @@
 #define TRUE 1
 #define FALSE 0
 
-#define TAM_MAX 10//20 es lo suficientemente grande?
+#define TAM_MAX 40//20 es lo suficientemente grande?
 
 atributo* crearAtributo(char *nombre, char *tipo,int visibilidad){
 	atributo *at;
@@ -156,8 +156,6 @@ void crearLayerXML(int numeroTotalDeClases){
 	free(linea);
 }
 
-//faltaria escoger la posicion en la que tiene que aparecer
-//solo haria falta meter en la estructura la posicion y cambiar la plantilla
 void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 	FILE *f;
 	FILE *resultado;
@@ -178,7 +176,10 @@ void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 	}
 	aux = fgets(linea,200,f);
 	while(aux != NULL){
-		if(strstr(linea,"<!--<dia:string>#NombreClase#</dia:string>-->")!=NULL){//nombre
+		if(strstr(linea,"<!--IdClase-->")!=NULL){//idClase
+			sprintf(linea,"%s%c%s%c%s%c%d%c%s%c%c%d%c%s\n","    <dia:object type=",'"',"UML - Class",'"'," version=",'"',0,'"'," id=",'"','O',numeroClase,'"',">");
+			fputs(linea,resultado);
+		}else	if(strstr(linea,"<!--<dia:string>#NombreClase#</dia:string>-->")!=NULL){//nombre
 			sprintf(linea,"%s%s%s\n","        <dia:string>#",clase->nombre,"#</dia:string>");
 			fputs(linea,resultado);
 		}else if(strstr(linea,"Posicion-->")!=NULL){//posicion
@@ -433,7 +434,7 @@ atributo** inicializarAtributos(){
 parametro*** inicializarParametro(){
 	int i=0,j=0;
 	parametro ***par;
-	par = (parametro ***) malloc((TAM_MAX)*sizeof(parametro**));
+	par = (parametro ***) malloc((1+TAM_MAX)*sizeof(parametro**));
 	while(i<TAM_MAX){
 		par[i] = (parametro **) malloc(TAM_MAX*sizeof(parametro*));
 		while(j<TAM_MAX){

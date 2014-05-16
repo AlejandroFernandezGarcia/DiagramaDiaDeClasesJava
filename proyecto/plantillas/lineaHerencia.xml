@@ -1,4 +1,4 @@
-    <dia:object type="UML - Generalization" version="1" id="O3">
+    <dia:object type="UML - Generalization" version="1" id="O3"><!--IdFlecha-->
       <dia:attribute name="obj_pos">
         <dia:point val="11.73,5.05"/>
       </dia:attribute>
@@ -35,7 +35,7 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O0" connection="6"/>
-        <dia:connection handle="1" to="O1" connection="1"/>
+        <dia:connection handle="0" to="O0" connection="6"/><!--ConexionCabeza-->
+        <dia:connection handle="1" to="O1" connection="1"/><!--ConexionCola-->
       </dia:connections>
     </dia:object>

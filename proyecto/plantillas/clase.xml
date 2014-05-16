@@ -1,4 +1,4 @@
-    <dia:object type="UML - Class" version="0" id="O0">
+    <dia:object type="UML - Class" version="0" id="O0"><!--IdClase-->
       <dia:attribute name="obj_pos">
         <dia:point val="14,6.9"/>
       </dia:attribute>
