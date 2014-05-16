@@ -43,7 +43,7 @@ void liberarPathFicheros(char **pathFicheros){
 	free(pathFicheros);
 }
 
-char **obtenerPathFicheros(const char *extension){
+char **obtenerPathFicheros(const char *extension,int *numTotalClases){
 	// /home/alejandro/NetBeansProjects/ER-12-04/src/interfazUsuario/escritorio
 	char **pathArchivos;
 	int numArchivos=0;
@@ -69,6 +69,7 @@ char **obtenerPathFicheros(const char *extension){
 		ldir = readdir(dir);
 		while(ldir != NULL){
 			if(comprobarExtension(ldir->d_name,extension)){
+				(*numTotalClases)++;
 				pathArchivos[archivoActual] = (char*) malloc(200*sizeof(char));
 				sprintf(pathArchivos[archivoActual],"%s/%s",directorio,ldir->d_name);
 				//strcpy(pathArchivos[archivoActual],ldir->d_name);

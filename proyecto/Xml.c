@@ -158,11 +158,13 @@ void crearLayerXML(int numeroTotalDeClases){
 
 //faltaria escoger la posicion en la que tiene que aparecer
 //solo haria falta meter en la estructura la posicion y cambiar la plantilla
-void crearClaseXML(clase *clase,int numeroClase){
+void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 	FILE *f;
 	FILE *resultado;
 	f=fopen("plantillas/clase.xml","r");
 	char *linea,*aux;
+	int posX=0;
+	int posY=0;
 	linea = malloc (200*sizeof(char));
 	aux = malloc(200*sizeof(char));
 	sprintf(aux,"%s%d%s","tmp/clase",numeroClase,".xml");
@@ -178,6 +180,21 @@ void crearClaseXML(clase *clase,int numeroClase){
 	while(aux != NULL){
 		if(strstr(linea,"<!--<dia:string>#NombreClase#</dia:string>-->")!=NULL){//nombre
 			sprintf(linea,"%s%s%s\n","        <dia:string>#",clase->nombre,"#</dia:string>");
+			fputs(linea,resultado);
+		}else if(strstr(linea,"Posicion-->")!=NULL){//posicion
+			if(numeroClase==0){
+				posX=0;
+				posY=0;
+			}else{
+				if((numTotalClases/2)>numeroClase){
+					posX= 15*numeroClase;
+					posY=	0;
+				}else{
+					posX= 15*((numeroClase)%(numTotalClases/2));
+					posY= 10;
+				}
+			}
+			sprintf(linea,"%s%c%d%c%d%c%s","        <dia:point val=",'"',posX,',',posY,'"',"/>");
 			fputs(linea,resultado);
 		}else if(strstr(linea,"Combinado de atributos")!=NULL){//copiar fichero atributos
 			copiarFicheroAtributos(resultado);

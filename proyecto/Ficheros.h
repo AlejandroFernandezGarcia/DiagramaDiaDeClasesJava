@@ -1,1 +1,1 @@
-char **obtenerPathFicheros(const char *extension);
+char **obtenerPathFicheros(const char *extension, int *numTotalClases);

@@ -48,6 +48,6 @@ clase* creaClase(char *nombre);
 void crearMetodoXML(metodo **lMet);
 void crearParametrosXML(parametro ***lPar);
 void crearAtributosXML(atributo **lAt);
-void crearClaseXML(clase *clase,int numeroClase);
+void crearClaseXML(clase *clase,int numeroClase,int numTotalClases);
 void crearLayerXML(int numeroTotalDeClases);
 void crearFinalXML(char *path, char *nombre);

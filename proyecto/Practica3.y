@@ -86,8 +86,9 @@ int main(){
 	const char extension[6] = ".java";
 	char **pathArchivos;
 	int i=0;
+	int numTotalClases=0;
 	char *rutaSalida,*nombreSalida;
-	pathArchivos = obtenerPathFicheros(extension);
+	pathArchivos = obtenerPathFicheros(extension,&numTotalClases);
 	rutaSalida = malloc(sizeof(char)*200);
 	nombreSalida = malloc(sizeof(char)*200);
 	printf("Nombre del fichero de salida\n");
@@ -120,7 +121,7 @@ int main(){
 		crearMetodoXML(met);
 		liberarMetodos(met);
 
-		crearClaseXML(c,i);
+		crearClaseXML(c,i,numTotalClases);
 		
 		free(c->nombre);
 		free(c);
