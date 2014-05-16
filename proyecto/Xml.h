@@ -33,13 +33,18 @@ struct tclase {
 };
 typedef struct tclase clase;
 
+/*Inicialización a NULL*/
+atributo** inicializarAtributos();
+parametro*** inicializarParametro();
+metodo** inicializarMetodo();
 
+/*Crear cada estructura*/
 atributo* crearAtributo(char *nombre, char *tipo, int visibilidad);
 parametro* crearParametro(char *nombre, char *tipo);
 metodo* crearMetodo(char *nombre,char *tipo, int visibilidad);
 clase* creaClase(char *nombre);
 
-
+/*Crear XML a partir de las estructuras*/
 void crearMetodoXML(metodo **lMet);
 void crearParametrosXML(parametro ***lPar);
 void crearAtributosXML(atributo **lAt);

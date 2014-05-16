@@ -1,8 +1,17 @@
 %{
 	#include "Ficheros.c"
+	#include "Xml.c"
 	#include <stdio.h>
 	void yyerror (char const *);
 	extern FILE *yyin;
+	atributo** at;
+	parametro ***par;
+	metodo** met;
+	clase *c;
+	int numAtributo=0;
+	int numMetodo=0;
+	int numParametro=0;
+	int numClases=0;
 
 	
 %}
@@ -19,7 +28,7 @@
 %token <valChar> LLAVE_A
 %token <valChar> PACKAGE
 %token <valChar> IMPORT
-%type <valChar> m_visibilidad
+%type <valInt> m_visibilidad
 %start S
 %%
 S : package imports clase atributos metodos '}' 
@@ -29,28 +38,30 @@ S : package imports clase atributos metodos '}'
 
 package: PACKAGE STRING ';';
 
-m_visibilidad: PUBLIC {$$="public";}
-	| PRIVATE {$$="private";}
-	| PROTECTED {$$="protected";}
-	| /*Default*/ {$$="default";}
+m_visibilidad: PUBLIC {$$=PUBLIC;}
+	| PRIVATE {$$=PRIVATE;}
+	| PROTECTED {$$=PROTECTED;}
+	| /*Default*/ {$$=PACKAGE;}
 	;
 
 imports: IMPORT STRING ';'
 	| 
 	;
 
-clase : m_visibilidad CLASS STRING '{' {printf("%s class %s {\n",$1,$3);}
+clase : m_visibilidad CLASS STRING '{' {c = crearClase($3); numClases++;}
 	;
 	
-atributo: m_visibilidad STRING STRING ';' {printf("%s %s %s;\n",$1,$2,$3);}
+atributo: m_visibilidad STRING STRING ';' {at[numAtributo] = crearAtributo($3,$2,$1); numAtributo++;}
 	;
 	
 atributos: atributos atributo
 	| atributo
 	;
 
-parametro: STRING STRING ','
-	| STRING STRING
+parametro: STRING STRING ',' {par[numMetodo][numParametro] = crearParametro($2,$1);
+										numParametro++;}
+	| STRING STRING {par[numMetodo][numParametro] = crearParametro($2,$1);
+						  numParametro++;}
 	;
 
 parametros: parametros parametro
@@ -64,10 +75,10 @@ relleno_metodo: relleno_metodo STRING
 	//| /*Metodo vacio*/
 	;
 
-metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {printf("%s %s %s (){",$1,$2,$3);}
-	| m_visibilidad STRING STRING '(' ')' '{' relleno_metodo '}' {printf("%s %s %s (){",$1,$2,$3);}
-	| m_visibilidad STRING STRING '(' parametros ')' '{' '}' {printf("%s %s %s (){",$1,$2,$3);}
-	| m_visibilidad STRING STRING '(' ')' '{' '}' {printf("%s %s %s (){",$1,$2,$3);}
+metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);numMetodo++;}
+	| m_visibilidad STRING STRING '(' ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;}
+	| m_visibilidad STRING STRING '(' parametros ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;}
+	| m_visibilidad STRING STRING '(' ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;}
 	; 
 
 %%
@@ -75,20 +86,61 @@ int main(){
 	const char extension[6] = ".java";
 	char **pathArchivos;
 	int i=0;
+	char *rutaSalida,*nombreSalida;
 	pathArchivos = obtenerPathFicheros(extension);
+	rutaSalida = malloc(sizeof(char)*200);
+	nombreSalida = malloc(sizeof(char)*200);
+	printf("Nombre del fichero de salida\n");
+	scanf("%s",nombreSalida);
+	printf("Directorio donde quieres guardarlo\n");
+	scanf("%s",rutaSalida);
 	FILE *f;
-	//hacer while de pathArvhivos
+	system("mkdir tmp");
 	while(pathArchivos[i] != NULL){
-		printf("\n%d-> %s\n",i,pathArchivos[i]);
+		/*Inicializar estructuras antes de cada parseo*/
+		numAtributo=0;
+		numMetodo=0;
+		numParametro=0;
+		at = inicializarAtributos();
+		par = inicializarParametro();
+		met = inicializarMetodo();
+		
+		/*Abrir fichero .java y asignarselo a la entrada del analizador*/
 		f = fopen(pathArchivos[i],"r");
 		yyin= f;
 		yyparse();
+		
+		/*Crea los XML intermedios generandolos a partir de las estructuras*/
+		crearAtributosXML(at);
+		crearParametrosXML(par);
+		crearMetodoXML(met);
+		crearClaseXML(c,i);
+		
+		/*Libera todas las estructuras*/
+		free(nombreSalida);
+		free(c->nombre);
+		free(c);
+		liberarParametros(par);
+		liberarAtributos(at);
+		liberarMetodos(met);
+		
 		i++;
 	}
 	fclose(f);
 	printf("\n");
+
+	printf("Finalizado el parseo de todas las clases.\n");
+	pritff("Generando %s.dia",nombreSalida);
+	crearLayerXML(numClases);
+	crearFinalXML(rutaSalida,nombreSalida);
+	
+	free(rutaSalida);
+
+	printf("--->Done.\n");
+	system("rm -fR tmp");
 	return 0;
 }
+
 void yyerror (char const *message) { 
 	fprintf (stderr,"%s\n", message);
 }
