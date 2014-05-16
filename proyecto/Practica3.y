@@ -36,7 +36,7 @@ S : package imports clase atributos metodos '}'
 	| package imports clase atributos '}'{printf("}\n");}
 	;
 
-package: PACKAGE STRING ';';
+package: PACKAGE STRING ';' {free($2);};
 
 m_visibilidad: T_PUBLIC {$$=PUBLIC;}
 	| T_PRIVATE {$$=PRIVATE;}
@@ -44,14 +44,15 @@ m_visibilidad: T_PUBLIC {$$=PUBLIC;}
 	| /*Default*/ {$$=DEFAULT;}
 	;
 
-imports: IMPORT STRING ';'
+imports: IMPORT STRING ';' {free($2);}
 	| 
 	;
 
-clase : m_visibilidad CLASS STRING '{' {c = crearClase($3); numClases++;}
+clase : m_visibilidad CLASS STRING '{' {c = crearClase($3); numClases++;free($3);}
 	;
 	
-atributo: m_visibilidad STRING STRING ';' {at[numAtributo] = crearAtributo($3,$2,$1); numAtributo++;}
+atributo: m_visibilidad STRING STRING ';' {at[numAtributo] = crearAtributo($3,$2,$1);
+														 numAtributo++;free($2);free($3);}
 	;
 	
 atributos: atributos atributo
@@ -59,26 +60,38 @@ atributos: atributos atributo
 	;
 
 parametro: STRING STRING ',' {par[numMetodo][numParametro] = crearParametro($2,$1);
-										numParametro++;}
+										numParametro++;free($1);free($2);}
 	| STRING STRING {par[numMetodo][numParametro] = crearParametro($2,$1);
-						  numParametro++;}
+						  numParametro++;free($1);free($2);}
 	;
 
 parametros: parametros parametro
 	| parametro
 	;
 	
-relleno_metodo: relleno_metodo STRING
-	| relleno_metodo STRING ';'
-	| STRING
-	| STRING ';'
+relleno_metodo: relleno_metodo STRING {free($2);}
+	| relleno_metodo STRING ';' {free($2);}
+	| STRING {free($1);}
+	| STRING ';' {free($1);}
 	//| /*Metodo vacio*/
 	;
 
-metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);numMetodo++;numParametro=0;}
-	| m_visibilidad STRING STRING '(' ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;numParametro=0;}
-	| m_visibilidad STRING STRING '(' parametros ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;numParametro=0;}
-	| m_visibilidad STRING STRING '(' ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;numParametro=0;}
+metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);
+																										  numMetodo++;
+																										  numParametro=0;
+																										  free($2);free($3);}
+	| m_visibilidad STRING STRING '(' ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);
+																					  numMetodo++;
+																					  numParametro=0;
+																					  free($2);free($3);}
+	| m_visibilidad STRING STRING '(' parametros ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1);
+																		  		 numMetodo++;
+																				 numParametro=0;
+																				 free($2);free($3);}
+	| m_visibilidad STRING STRING '(' ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1);
+																  numMetodo++;
+																  numParametro=0;
+																  free($2);free($3);}
 	; 
 
 %%
@@ -130,8 +143,8 @@ int main(){
 		
 		i++;
 		//break;
+		fclose(f);
 	}
-	fclose(f);
 	printf("\n");
 
 	printf("Finalizado el parseo de todas las clases.\n");
@@ -141,7 +154,8 @@ int main(){
 	
 	free(rutaSalida);
 	free(nombreSalida);
-
+	liberarPathFicheros(pathArchivos);
+	
 	printf("--->Done.\n");
 	system("rm -fR tmp");
 	return 0;

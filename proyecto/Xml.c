@@ -149,9 +149,9 @@ void crearLayerXML(int numeroTotalDeClases){
 			aux = fgets(linea,200,f);
 		}
 		ficheroActual++;
+		fclose(f);
 	}
 	fputs("  </dia:layer>",resultado);
-	fclose(f);
 	fclose(resultado);
 	free(linea);
 }
