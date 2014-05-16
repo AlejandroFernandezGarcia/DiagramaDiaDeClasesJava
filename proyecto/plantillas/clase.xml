@@ -6,7 +6,7 @@
         <dia:rectangle val="13.95,6.85;36.88,13.55"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="14,6.9"/>
+        <!--<dia:point val="14,6.9"/>Posicion-->
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="22.830000000000002"/>
