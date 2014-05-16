@@ -6,6 +6,7 @@
 	//escapar comentarios
 	//escapar contenido de metodos
 	//escapar imports
+	//free del p?
 %}
 string [^\x2C\t\n\x3B\x20\x28\x29\x7B\x7D]+
 comas [\x2C]
@@ -13,9 +14,9 @@ comas [\x2C]
 package {return PACKAGE;}
 import {return IMPORT;}
 
-public {return PUBLIC;}
-private {return PRIVATE;}
-protected {return PROTECTED;}
+public {return T_PUBLIC;}
+private {return T_PRIVATE;}
+protected {return T_PROTECTED;}
 
 
 
@@ -28,7 +29,7 @@ class {return CLASS;}
 \, {return ',';}
 
 {string}	{
-	p=(char*) malloc(sizeof(char)*strlen(yytext));
+	p=(char*) malloc(sizeof(char)*(strlen(yytext)+1));
 	strcpy(p,yytext);
 	yylval.valChar = p;
 	return STRING;

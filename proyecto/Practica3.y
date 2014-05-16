@@ -21,9 +21,9 @@
 }
 %error-verbose
 %token <valChar> STRING
-%token <valChar> PUBLIC
-%token <valChar> PRIVATE
-%token <valChar> PROTECTED
+%token <valChar> T_PUBLIC
+%token <valChar> T_PRIVATE
+%token <valChar> T_PROTECTED
 %token <valChar> CLASS
 %token <valChar> LLAVE_A
 %token <valChar> PACKAGE
@@ -38,10 +38,10 @@ S : package imports clase atributos metodos '}'
 
 package: PACKAGE STRING ';';
 
-m_visibilidad: PUBLIC {$$=PUBLIC;}
-	| PRIVATE {$$=PRIVATE;}
-	| PROTECTED {$$=PROTECTED;}
-	| /*Default*/ {$$=PACKAGE;}
+m_visibilidad: T_PUBLIC {$$=PUBLIC;}
+	| T_PRIVATE {$$=PRIVATE;}
+	| T_PROTECTED {$$=PROTECTED;}
+	| /*Default*/ {$$=DEFAULT;}
 	;
 
 imports: IMPORT STRING ';'
@@ -75,10 +75,10 @@ relleno_metodo: relleno_metodo STRING
 	//| /*Metodo vacio*/
 	;
 
-metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);numMetodo++;}
-	| m_visibilidad STRING STRING '(' ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;}
-	| m_visibilidad STRING STRING '(' parametros ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;}
-	| m_visibilidad STRING STRING '(' ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;}
+metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);numMetodo++;numParametro=0;}
+	| m_visibilidad STRING STRING '(' ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;numParametro=0;}
+	| m_visibilidad STRING STRING '(' parametros ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;numParametro=0;}
+	| m_visibilidad STRING STRING '(' ')' '{' '}' {met[numMetodo] = crearMetodo($3,$2,$1); numMetodo++;numParametro=0;}
 	; 
 
 %%
@@ -112,29 +112,34 @@ int main(){
 		
 		/*Crea los XML intermedios generandolos a partir de las estructuras*/
 		crearAtributosXML(at);
+		liberarAtributos(at);
+		
 		crearParametrosXML(par);
+		liberarParametros(par);
+				
 		crearMetodoXML(met);
+		liberarMetodos(met);
+
 		crearClaseXML(c,i);
 		
-		/*Libera todas las estructuras*/
-		free(nombreSalida);
 		free(c->nombre);
 		free(c);
-		liberarParametros(par);
-		liberarAtributos(at);
-		liberarMetodos(met);
+		
+		system("rm -f tmp/parametros*.xml");
 		
 		i++;
+		//break;
 	}
 	fclose(f);
 	printf("\n");
 
 	printf("Finalizado el parseo de todas las clases.\n");
-	pritff("Generando %s.dia",nombreSalida);
+	printf("Generando %s.dia\n",nombreSalida);
 	crearLayerXML(numClases);
 	crearFinalXML(rutaSalida,nombreSalida);
 	
 	free(rutaSalida);
+	free(nombreSalida);
 
 	printf("--->Done.\n");
 	system("rm -fR tmp");

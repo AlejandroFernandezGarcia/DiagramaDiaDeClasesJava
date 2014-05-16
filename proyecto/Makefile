@@ -6,7 +6,7 @@ all:
 	bison -o $(SOURCE).tab.c $(SOURCE).y -yd 
 	$(CC) -c Ficheros.c Ficheros.h
 	$(CC) -c Xml.c Xml.h
-	$(CC) -o $(SOURCE) lex.yy.c $(SOURCE).tab.c -ly -lfl
+	$(CC) -g -o $(SOURCE) lex.yy.c $(SOURCE).tab.c -ly -lfl
 run: all
 	./$(SOURCE)
 clean:

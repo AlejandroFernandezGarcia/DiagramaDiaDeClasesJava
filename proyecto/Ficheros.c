@@ -30,7 +30,17 @@ int contarFicheros(char const *directorio,char const *extension){
 		}
 		auxLdir = readdir(auxDir);
 	}
+	closedir(auxDir);
 	return contador;
+}
+
+void liberarPathFicheros(char **pathFicheros){
+	int i=0;
+	while(pathFicheros[i] != NULL){
+		free(pathFicheros[i]);
+		i++;
+	}
+	free(pathFicheros);
 }
 
 char **obtenerPathFicheros(const char *extension){
@@ -44,26 +54,18 @@ char **obtenerPathFicheros(const char *extension){
 	system("clear");
 	printf("Path absoluto o relativo del codigo en java\n");
 	scanf("%s",directorio);
-	if(directorio[0]=='/'){
-		dir=opendir(directorio);
-	}else{
-		char *aux;
-		aux = malloc(200*sizeof(char));
-		strcpy(aux,getcwd(aux,200*sizeof(char)));
-		//strcat(aux,directorio);
-		sprintf(aux,"%s/%s",aux,directorio);
-		strcpy(directorio,aux);
-		//printf("%s\n",directorio);
-		free(aux);
-		dir=opendir(directorio);
-	}
+	dir=opendir(directorio);
 	if(dir==NULL){
 		perror("Error");
 		exit(1);
 	}else{
 		//printf(" no Error\n");
 		numArchivos = contarFicheros(directorio,extension);
-		pathArchivos = (char**) malloc(numArchivos*sizeof(char*)+1);
+		pathArchivos = (char**) malloc((1+numArchivos)*sizeof(char*));
+		int w;
+		for(w=0;w < numArchivos+1; w++){
+			pathArchivos[w] = NULL;
+		}
 		ldir = readdir(dir);
 		while(ldir != NULL){
 			if(comprobarExtension(ldir->d_name,extension)){
@@ -74,7 +76,7 @@ char **obtenerPathFicheros(const char *extension){
 			}
 			ldir = readdir(dir);
 		}
-		pathArchivos[numArchivos+1] = NULL;//?
+		//pathArchivos[numArchivos+1] = NULL;//?
 	}
 	if(closedir(dir)==-1){
 		printf("Error closedir\n");
@@ -84,3 +86,9 @@ char **obtenerPathFicheros(const char *extension){
 	
 	return pathArchivos;
 }
+
+/*int main(){
+	char **pathArchivos = obtenerPathFicheros(".java");
+	liberarPathFicheros(pathArchivos);
+	return 1;
+}*/
