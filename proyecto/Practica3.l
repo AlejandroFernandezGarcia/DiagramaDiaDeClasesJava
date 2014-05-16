@@ -29,7 +29,7 @@ class {return CLASS;}
 \, {return ',';}
 
 {string}	{
-	p=(char*) malloc(sizeof(char)*(strlen(yytext)+1));
+	p=(char*) malloc(sizeof(char)*(strlen(yytext)));
 	strcpy(p,yytext);
 	yylval.valChar = p;
 	return STRING;
