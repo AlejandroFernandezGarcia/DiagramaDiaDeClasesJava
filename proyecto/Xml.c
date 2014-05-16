@@ -298,13 +298,15 @@ void copiarFicherosParametros(FILE *resultado, int numFichero){
 	sprintf(aux,"%s%d%s","tmp/parametros",numFichero,".xml");
 	par = fopen(aux,"r");
 	free(aux);
-	aux = fgets(linea,200,par);
-	while(aux != NULL){
-		fputs(linea,resultado);
+	if(par!=NULL){
 		aux = fgets(linea,200,par);
+		while(aux != NULL){
+			fputs(linea,resultado);
+			aux = fgets(linea,200,par);
+		}
+		fputs("\n",resultado);
+		fclose(par);
 	}
-	fputs("\n",resultado);
-	fclose(par);
 	free(linea);
 }
 
@@ -414,7 +416,7 @@ atributo** inicializarAtributos(){
 parametro*** inicializarParametro(){
 	int i=0,j=0;
 	parametro ***par;
-	par = (parametro ***) malloc(TAM_MAX*sizeof(parametro**));
+	par = (parametro ***) malloc((TAM_MAX)*sizeof(parametro**));
 	while(i<TAM_MAX){
 		par[i] = (parametro **) malloc(TAM_MAX*sizeof(parametro*));
 		while(j<TAM_MAX){
@@ -424,6 +426,7 @@ parametro*** inicializarParametro(){
 		i++;
 		j=0;
 	}
+	par[i] = NULL;
 	return par;
 }
 
