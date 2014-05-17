@@ -7,6 +7,10 @@
 #define DEFAULT 3
 #define PROTECTED 2
 
+#define ASOCIACION 10
+#define HERENCIA 11
+#define REALIZACION 12
+
 struct tatributo {
 	char *nombre;
 	char *tipo;
@@ -32,6 +36,14 @@ struct tclase {
 	char *nombre;
 };
 typedef struct tclase clase;
+
+struct tRelaciones{
+	int tipo;
+	int idCabeza;
+	int idCola;
+};
+typedef struct tRelaciones relacion;
+
 
 /*Inicialización a NULL*/
 atributo** inicializarAtributos();

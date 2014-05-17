@@ -8,11 +8,16 @@
 	parametro ***par;
 	metodo** met;
 	clase *c;
+	char **nombresClases;
 	int numAtributo=0;
 	int numMetodo=0;
 	int numParametro=0;
 	int numClases=0;
-
+	relacion *relaciones;
+	int numRelacion=0;
+	int numTotalClases=0;
+	int z;
+	int control=FALSE;
 	
 %}
 %union{
@@ -51,8 +56,21 @@ imports: IMPORT STRING ';' {free($2);}
 clase : m_visibilidad CLASS STRING '{' {c = crearClase($3); numClases++;free($3);}
 	;
 	
-atributo: m_visibilidad STRING STRING ';' {at[numAtributo] = crearAtributo($3,$2,$1);
-														 numAtributo++;free($2);free($3);}
+atributo: m_visibilidad STRING STRING ';'	{/*for(z=0;z<numTotalClases;z++){
+															if(strstr($2,nombresClases[z])!=NULL){
+																relacion rel;
+																rel.tipo=ASOCIACION;
+																rel.idCabeza=z;
+																rel.idCola=numClases;
+																relaciones[numRelacion]=rel;
+																numRelacion++;
+																control=TRUE;
+															}
+														}
+														if(!control){*/
+															at[numAtributo] = crearAtributo($3,$2,$1);
+															numAtributo++;
+														free($2);free($3);}
 	;
 	
 atributos: atributos atributo
@@ -60,9 +78,9 @@ atributos: atributos atributo
 	;
 
 parametro: STRING STRING ',' {par[numMetodo][numParametro] = crearParametro($2,$1);
-										numParametro++;free($1);free($2);}
+										numParametro++;}
 	| STRING STRING {par[numMetodo][numParametro] = crearParametro($2,$1);
-						  numParametro++;free($1);free($2);}
+						  numParametro++;}
 	;
 
 parametros: parametros parametro
@@ -76,7 +94,7 @@ relleno_metodo: relleno_metodo STRING {free($2);}
 	//| /*Metodo vacio*/
 	;
 
-metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);
+metodo: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);
 																										  numMetodo++;
 																										  numParametro=0;
 																										  free($2);free($3);}
@@ -94,14 +112,19 @@ metodos: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {
 																  free($2);free($3);}
 	; 
 
+metodos: metodos metodo
+	| metodo
+	;
+
 %%
 int main(){
 	const char extension[6] = ".java";
 	char **pathArchivos;
 	int i=0;
-	int numTotalClases=0;
 	char *rutaSalida,*nombreSalida;
-	pathArchivos = obtenerPathFicheros(extension,&numTotalClases);
+	nombresClases = (char**) malloc(TAM_MAX*sizeof(char*));
+	pathArchivos = obtenerPathFicheros(extension,&numTotalClases,nombresClases);
+	relaciones = malloc(numTotalClases*(numTotalClases-1)*sizeof(relacion));//??????
 	rutaSalida = malloc(sizeof(char)*200);
 	nombreSalida = malloc(sizeof(char)*200);
 	printf("Nombre del fichero de salida\n");
@@ -120,6 +143,7 @@ int main(){
 		met = inicializarMetodo();
 		
 		/*Abrir fichero .java y asignarselo a la entrada del analizador*/
+		printf("%s",pathArchivos[i]);
 		f = fopen(pathArchivos[i],"r");
 		yyin= f;
 		yyparse();
@@ -155,6 +179,7 @@ int main(){
 	free(rutaSalida);
 	free(nombreSalida);
 	liberarPathFicheros(pathArchivos);
+	liberarPathFicheros(nombresClases);
 	
 	printf("--->Done.\n");
 	system("rm -fR tmp");

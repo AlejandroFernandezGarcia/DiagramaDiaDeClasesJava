@@ -187,13 +187,20 @@ void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 				posX=0;
 				posY=0;
 			}else{
-				if((numTotalClases/2)>numeroClase){
+				if(((float)numTotalClases/2)>numeroClase){
+					posX= 20*numeroClase;
+					posY=	0;
+				}else{
+					posX= 20*((numeroClase)%(numTotalClases/2));
+					posY= 15;
+				}
+				/*if((numTotalClases/2)>numeroClase){
 					posX= 15*numeroClase;
 					posY=	0;
 				}else{
 					posX= 15*((numeroClase)%(numTotalClases/2));
 					posY= 10;
-				}
+				}*/
 			}
 			sprintf(linea,"%s%c%d%c%d%c%s","        <dia:point val=",'"',posX,',',posY,'"',"/>");
 			fputs(linea,resultado);
@@ -266,7 +273,7 @@ void crearParametrosXML(parametro ***lPar){
 	FILE *f;
 	FILE *resultado;
 	f = fopen("plantillas/parametrosMetodo.xml","r");
-	while((lPar[numMetodo][0]!=NULL) && (numMetodo < TAM_MAX)){
+	while((lPar[numMetodo]!=NULL) && (numMetodo < TAM_MAX)){
 		i=0;
 		
 		aux = malloc(200*sizeof(char));//¿?¿?¿?¿Le habia puesto 500
@@ -301,7 +308,6 @@ void crearParametrosXML(parametro ***lPar){
 		}
 		fputs("          </dia:attribute>",resultado);
 		numMetodo++;
-		free(aux);
 		fclose(resultado);
 	}
 	fclose(f);
