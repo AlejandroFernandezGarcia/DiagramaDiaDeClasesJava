@@ -12,6 +12,9 @@
 
 int comprobarExtension(char *nombre, char const *extension){
 	if(strstr(nombre,extension)!=NULL){
+		if(nombre[strlen(nombre)-1]=='~'){
+			return FALSE;
+		}
 		return TRUE;
 	}else{
 		return FALSE;
@@ -43,12 +46,15 @@ void liberarPathFicheros(char **pathFicheros){
 	free(pathFicheros);
 }
 
-char **obtenerPathFicheros(const char *extension,int *numTotalClases){
+char **obtenerPathFicheros(const char *extension,int *numTotalClases,char **nombresClases){
 	// /home/alejandro/NetBeansProjects/ER-12-04/src/interfazUsuario/escritorio
 	char **pathArchivos;
+	char *aux;
 	int numArchivos=0;
 	int archivoActual=0;
+	char **nombres=nombresClases;
 	DIR *dir;
+	aux = malloc(200*sizeof(char));
 	struct dirent *ldir;
 	char *directorio = malloc(200*sizeof(char));
 	system("clear");
@@ -71,8 +77,13 @@ char **obtenerPathFicheros(const char *extension,int *numTotalClases){
 			if(comprobarExtension(ldir->d_name,extension)){
 				(*numTotalClases)++;
 				pathArchivos[archivoActual] = (char*) malloc(200*sizeof(char));
+				nombres[archivoActual] = (char*) malloc(200*sizeof(char));
 				sprintf(pathArchivos[archivoActual],"%s/%s",directorio,ldir->d_name);
-				//strcpy(pathArchivos[archivoActual],ldir->d_name);
+				strcpy(aux,ldir->d_name);
+				aux[strlen(aux)-5]='\0';
+				strcpy(nombres[archivoActual],aux);
+				
+				printf("->%s\n",pathArchivos[archivoActual]);
 				archivoActual++;
 			}
 			ldir = readdir(dir);
@@ -82,8 +93,10 @@ char **obtenerPathFicheros(const char *extension,int *numTotalClases){
 	if(closedir(dir)==-1){
 		printf("Error closedir\n");
 	}
+	nombres[*numTotalClases]=NULL;
 	//hacer frees
 	free(directorio);
+	free(aux);
 	
 	return pathArchivos;
 }
