@@ -171,9 +171,20 @@ int main(){
 	}
 	printf("\n");
 
+	/**Prueba relaciones*/
+	relacion rel;
+	rel.tipo=ASOCIACION;
+	rel.idCabeza=0;
+	rel.idCola=1;
+	numRelacion=1;
+	relaciones[0]=rel;
+	crearRelacionesXML(relaciones, numTotalClases,numRelacion);
+	
+	/*fin*/
+
 	printf("Finalizado el parseo de todas las clases.\n");
 	printf("Generando %s.dia\n",nombreSalida);
-	crearLayerXML(numClases);
+	crearLayerXML(numClases,numRelacion);
 	crearFinalXML(rutaSalida,nombreSalida);
 	
 	free(rutaSalida);
@@ -183,6 +194,7 @@ int main(){
 	
 	printf("--->Done.\n");
 	system("rm -fR tmp");
+	
 	return 0;
 }
 
