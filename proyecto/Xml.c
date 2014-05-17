@@ -126,10 +126,70 @@ void crearFinalXML(char *path, char *nombre){
 	free(linea);
 }
 
-void crearLayerXML(int numeroTotalDeClases){
+void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numeroRelaciones){
+	FILE *f;
+	FILE *resultado;
+	int relacionActual=0;
+	char *aux, *linea;
+	linea = malloc (sizeof(char)*200);
+	while(relacionActual < numeroRelaciones){
+		aux = malloc (sizeof(char)*200);
+		switch(relaciones[relacionActual].tipo){
+			case ASOCIACION:
+				f = fopen("plantillas/lineaBasica.xml","r");
+			break;
+			case HERENCIA:
+				//TODO
+			break;
+			case REALIZACION:
+				//TODO
+			break;
+		}
+		sprintf(aux,"%s%d%s","tmp/linea",relacionActual,".xml");
+		resultado = fopen(aux,"w");
+		free(aux);
+		aux = fgets(linea,200,f);
+		while(aux != NULL){
+			aux = malloc (sizeof(char)*200);
+			if(strstr(linea,"<!--IdFlecha-->") != NULL){
+				switch(relaciones[relacionActual].tipo){
+					case ASOCIACION:
+						sprintf(aux,"%s%c%s%c%s%c%d%c%s%c%c%d%c%s\n","    <dia:object type=",'"',"Standard - Line",'"'
+															," version=",'"',0,'"'," id=",'"','O',relacionActual+numeroTotalDeClases,'"',">");
+						fputs(aux,resultado);
+					break;
+					case HERENCIA:
+						//TODO
+					break;
+					case REALIZACION:
+						//TODO
+					break;
+				}
+			}else if(strstr(linea,"<!--ConexionCola-->") != NULL){
+				sprintf(aux,"%s%c%d%c%s%c%c%d%c%s%c%d%c%s\n","        <dia:connection handle=",'"',0,'"'," to=",'"','O',relaciones[relacionActual].idCola,'"'," connection=",'"',8,'"',"/>");
+				fputs(aux,resultado);
+			}else if(strstr(linea,"<!--ConexionCabeza-->") != NULL){
+				sprintf(aux,"%s%c%d%c%s%c%c%d%c%s%c%d%c%s\n","        <dia:connection handle=",'"',1,'"'," to=",'"','O',relaciones[relacionActual].idCabeza,'"'," connection=",'"',8,'"',"/>");
+				fputs(aux,resultado);
+			}else{
+				fputs(linea,resultado);
+			}
+			free(aux);
+			aux = fgets(linea,200,f);
+		}
+		relacionActual++;
+		fclose(f);
+		fclose(resultado);
+	}
+	
+	free(linea);
+}
+
+void crearLayerXML(int numeroTotalDeClases,int numRelacion){
 	FILE *f;
 	FILE *resultado;
 	int ficheroActual=0;
+	int relacionActual=0;
 	char *aux,*linea;
 	linea = malloc (sizeof(char)*200);
 	aux = malloc (sizeof(char)*200);
@@ -138,6 +198,7 @@ void crearLayerXML(int numeroTotalDeClases){
 	" visible=",'"',"true",'"'," active=",'"',"true",'"',">");
 	fputs(aux,resultado);
 	free(aux);
+	//añadir las relaciones tambien
 	while(ficheroActual < numeroTotalDeClases){
 		aux = malloc (sizeof(char)*200);
 		sprintf(aux,"%s%d%s","tmp/clase",ficheroActual,".xml");
@@ -149,6 +210,19 @@ void crearLayerXML(int numeroTotalDeClases){
 			aux = fgets(linea,200,f);
 		}
 		ficheroActual++;
+		fclose(f);
+	}
+	while(relacionActual < numRelacion){
+		aux = malloc (sizeof(char)*200);
+		sprintf(aux,"%s%d%s","tmp/linea",relacionActual,".xml");
+		f=fopen(aux,"r");
+		free(aux);
+		aux = fgets(linea,200,f);
+		while(aux != NULL){
+			fputs(linea,resultado);
+			aux = fgets(linea,200,f);
+		}
+		relacionActual++;
 		fclose(f);
 	}
 	fputs("  </dia:layer>",resultado);

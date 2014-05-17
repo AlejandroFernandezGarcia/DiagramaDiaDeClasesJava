@@ -35,7 +35,7 @@
         <dia:string>##</dia:string>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O0" connection="6"/><!--ConexionCabeza-->
-        <dia:connection handle="1" to="O1" connection="1"/><!--ConexionCola-->
+        <dia:connection handle="0" to="O0" connection="8"/><!--ConexionCabeza-->
+        <dia:connection handle="1" to="O1" connection="8"/><!--ConexionCola-->
       </dia:connections>
     </dia:object>

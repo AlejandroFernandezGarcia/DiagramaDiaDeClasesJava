@@ -61,5 +61,6 @@ void crearMetodoXML(metodo **lMet);
 void crearParametrosXML(parametro ***lPar);
 void crearAtributosXML(atributo **lAt);
 void crearClaseXML(clase *clase,int numeroClase,int numTotalClases);
-void crearLayerXML(int numeroTotalDeClases);
+void crearLayerXML(int numeroTotalDeClases,int numRelacion);
 void crearFinalXML(char *path, char *nombre);
+void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numeroRelaciones);
