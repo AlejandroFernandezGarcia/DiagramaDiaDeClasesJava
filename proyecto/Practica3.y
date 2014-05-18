@@ -29,6 +29,10 @@
 %token <valChar> T_PUBLIC
 %token <valChar> T_PRIVATE
 %token <valChar> T_PROTECTED
+%token <valChar> EXTENDS
+%token <valChar> IMPLEMENTS
+%token <valChar> INTERFACE
+%token <valChar> ABSTRACT
 %token <valChar> CLASS
 %token <valChar> LLAVE_A
 %token <valChar> PACKAGE
@@ -36,9 +40,14 @@
 %type <valInt> m_visibilidad
 %start S
 %%
-S : package imports clase atributos metodos '}' 
-	| package imports clase metodos '}'
-	| package imports clase atributos '}'{printf("}\n");}
+S : package imports tipo_fichero ext_imp '{' atributos metodos '}' 
+	| package imports tipo_fichero ext_imp '{' metodos '}'
+	| package imports tipo_fichero ext_imp '{' atributos '}'
+	;
+
+ext_imp: EXTENDS STRING //Flecha herenncia
+	| IMPLEMENTS STRING  //Flecha realizacion
+	| /*Vacio*/
 	;
 
 package: PACKAGE STRING ';' {free($2);};
@@ -53,7 +62,9 @@ imports: IMPORT STRING ';' {free($2);}
 	| 
 	;
 
-clase : m_visibilidad CLASS STRING '{' {c = crearClase($3); numClases++;free($3);}
+tipo_fichero : m_visibilidad CLASS STRING  {c = crearClase($3); numClases++;free($3);}
+	| m_visibilidad INTERFACE STRING 
+	| m_visibilidad ABSTRACT CLASS STRING
 	;
 	
 atributo: m_visibilidad STRING STRING ';'	{for(z=0;z<numTotalClases;z++){
