@@ -131,6 +131,7 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 	FILE *resultado;
 	int relacionActual=0;
 	char *aux, *linea;
+	int posX,posY;
 	linea = malloc (sizeof(char)*200);
 	while(relacionActual < numeroRelaciones){
 		aux = malloc (sizeof(char)*200);
@@ -165,11 +166,34 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 						//TODO
 					break;
 				}
+				/**
+				if(((float)numTotalClases/2)>numeroClase){
+					posX= 20*numeroClase;
+					posY=	0;
+				}else{
+					posX= 20*((numeroClase)%(numTotalClases/2));
+					posY= 15;
+				}
+				*/
 			}else if(strstr(linea,"<!--ConexionCola-->") != NULL){
-				sprintf(aux,"%s%c%d%c%s%c%c%d%c%s%c%d%c%s\n","        <dia:connection handle=",'"',0,'"'," to=",'"','O',relaciones[relacionActual].idCola,'"'," connection=",'"',8,'"',"/>");
+				if(((float)numeroTotalDeClases/2)>relaciones[relacionActual].idCola){
+					posX= 20*(relaciones[relacionActual].idCola)+4;
+					posY=	3;
+				}else{
+					posX= 20*((relaciones[relacionActual].idCola)%(numeroTotalDeClases/2))+4;
+					posY= 15;
+				}
+				sprintf(aux,"%s%c%d,%d%c%s","<dia:point val=",'"',posX,posY,'"',"/>");
 				fputs(aux,resultado);
 			}else if(strstr(linea,"<!--ConexionCabeza-->") != NULL){
-				sprintf(aux,"%s%c%d%c%s%c%c%d%c%s%c%d%c%s\n","        <dia:connection handle=",'"',1,'"'," to=",'"','O',relaciones[relacionActual].idCabeza,'"'," connection=",'"',8,'"',"/>");
+				if(((float)numeroTotalDeClases/2)>relaciones[relacionActual].idCabeza){
+					posX= 20*(relaciones[relacionActual].idCabeza)+4;
+					posY=	3;
+				}else{
+					posX= 20*((relaciones[relacionActual].idCabeza)%(numeroTotalDeClases/2))+4;
+					posY= 15;
+				}
+				sprintf(aux,"%s%c%d,%d%c%s","<dia:point val=",'"',posX,posY,'"',"/>");
 				fputs(aux,resultado);
 			}else{
 				fputs(linea,resultado);
