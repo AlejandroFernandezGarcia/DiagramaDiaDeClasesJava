@@ -18,7 +18,11 @@ public {return T_PUBLIC;}
 private {return T_PRIVATE;}
 protected {return T_PROTECTED;}
 
+extends {return EXTENDS;}
+implements {return IMPLEMENTS;}
 
+interface {return INTERFACE;}
+abstract {return ABSTRACT;}
 
 class {return CLASS;}
 \{ {return '{';}

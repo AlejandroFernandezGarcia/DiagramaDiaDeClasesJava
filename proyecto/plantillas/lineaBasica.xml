@@ -22,6 +22,6 @@
         <dia:real val="0.5"/>
       </dia:attribute>
       <dia:attribute name="line_width">
-        <dia:real val="0.15000001192092896"/>
+        <dia:real val="0.12000001192092896"/>
       </dia:attribute>
     </dia:object>
