@@ -9,5 +9,7 @@ all:
 	$(CC) -g -o $(SOURCE) lex.yy.c $(SOURCE).tab.c -ly -lfl
 run: all
 	./$(SOURCE)
+test1: all
+	./$(SOURCE) < ejemplos/Ejemplo1
 clean:
-	rm -f $(SOURCE) lex.yy.c $(SOURCE).tab.c $(SOURCE).tab.h *.*~ *~ *.gch *.o
+	rm -f $(SOURCE) lex.yy.c $(SOURCE).tab.c $(SOURCE).tab.h *.*~ *~ *.gch *.o *.dia
