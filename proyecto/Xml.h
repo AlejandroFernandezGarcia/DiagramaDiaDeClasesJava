@@ -34,6 +34,8 @@ typedef struct tmetodo metodo;
 
 struct tclase {
 	char *nombre;
+	int interfaz;
+	int abstracta;
 };
 typedef struct tclase clase;
 
@@ -54,7 +56,7 @@ metodo** inicializarMetodo();
 atributo* crearAtributo(char *nombre, char *tipo, int visibilidad);
 parametro* crearParametro(char *nombre, char *tipo);
 metodo* crearMetodo(char *nombre,char *tipo, int visibilidad);
-clase* creaClase(char *nombre);
+clase* creaClase(char *nombre, int interfaz, int abstracta);
 
 /*Crear XML a partir de las estructuras*/
 void crearMetodoXML(metodo **lMet);
