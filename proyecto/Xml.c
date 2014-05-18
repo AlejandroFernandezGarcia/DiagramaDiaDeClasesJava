@@ -41,12 +41,14 @@ metodo* crearMetodo(char *nombre,char *tipo, int visibilidad){
 	return met; 
 }
 
-clase* crearClase(char *nombre){/*Hace falta puntero¿?¿?*/
+clase* crearClase(char *nombre, int interfaz, int abstracta){/*Hace falta puntero¿?¿?*/
 	clase *clase;
 	clase = malloc(sizeof(clase));
 	clase->nombre = malloc(sizeof(char)*200);
 	
 	strcpy(clase->nombre,nombre);
+	clase->interfaz = interfaz;
+	clase->abstracta = abstracta;
 	return clase;
 }
 
@@ -135,17 +137,7 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 	linea = malloc (sizeof(char)*200);
 	while(relacionActual < numeroRelaciones){
 		aux = malloc (sizeof(char)*200);
-		switch(relaciones[relacionActual].tipo){
-			case ASOCIACION:
-				f = fopen("plantillas/lineaBasica.xml","r");
-			break;
-			case HERENCIA:
-				//TODO
-			break;
-			case REALIZACION:
-				//TODO
-			break;
-		}
+		f = fopen("plantillas/lineaBasica.xml","r");
 		sprintf(aux,"%s%d%s","tmp/linea",relacionActual,".xml");
 		resultado = fopen(aux,"w");
 		free(aux);
@@ -153,28 +145,9 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 		while(aux != NULL){
 			aux = malloc (sizeof(char)*200);
 			if(strstr(linea,"<!--IdFlecha-->") != NULL){
-				switch(relaciones[relacionActual].tipo){
-					case ASOCIACION:
-						sprintf(aux,"%s%c%s%c%s%c%d%c%s%c%c%d%c%s\n","    <dia:object type=",'"',"Standard - Line",'"'
+				sprintf(aux,"%s%c%s%c%s%c%d%c%s%c%c%d%c%s\n","    <dia:object type=",'"',"Standard - Line",'"'
 															," version=",'"',0,'"'," id=",'"','O',relacionActual+numeroTotalDeClases,'"',">");
-						fputs(aux,resultado);
-					break;
-					case HERENCIA:
-						//TODO
-					break;
-					case REALIZACION:
-						//TODO
-					break;
-				}
-				/**
-				if(((float)numTotalClases/2)>numeroClase){
-					posX= 20*numeroClase;
-					posY=	0;
-				}else{
-					posX= 20*((numeroClase)%(numTotalClases/2));
-					posY= 15;
-				}
-				*/
+				fputs(aux,resultado);
 			}else if(strstr(linea,"<!--ConexionCola-->") != NULL){
 				if(((float)numeroTotalDeClases/2)>relaciones[relacionActual].idCola){
 					posX= 20*(relaciones[relacionActual].idCola)+4;
@@ -194,6 +167,32 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 					posY= 15;
 				}
 				sprintf(aux,"%s%c%d,%d%c%s","<dia:point val=",'"',posX,posY,'"',"/>");
+				fputs(aux,resultado);
+			}else if(strstr(linea,"<!--Estilo de linea-->") != NULL){
+				switch(relaciones[relacionActual].tipo){
+					case ASOCIACION:
+						sprintf(aux,"%s%c%d%c%s\n","        <dia:enum val=",'"',0,'"',"/>");
+					break;
+					case HERENCIA:
+						sprintf(aux,"%s%c%d%c%s\n","        <dia:enum val=",'"',0,'"',"/>");
+					break;
+					case REALIZACION:
+						sprintf(aux,"%s%c%d%c%s\n","        <dia:enum val=",'"',1,'"',"/>");
+					break;
+				}
+				fputs(aux,resultado);
+			}else if(strstr(linea,"<!--Cabeza de la linea-->") != NULL){
+				switch(relaciones[relacionActual].tipo){
+					case ASOCIACION:
+						sprintf(aux,"%s%c%d%c%s\n","        <dia:enum val=",'"',1,'"',"/>");
+					break;
+					case HERENCIA:
+						sprintf(aux,"%s%c%d%c%s\n","        <dia:enum val=",'"',12,'"',"/>");
+					break;
+					case REALIZACION:
+						sprintf(aux,"%s%c%d%c%s\n","        <dia:enum val=",'"',12,'"',"/>");
+					break;
+				}
 				fputs(aux,resultado);
 			}else{
 				fputs(linea,resultado);
@@ -300,7 +299,7 @@ void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 					posY= 10;
 				}*/
 			}
-			sprintf(linea,"%s%c%d%c%d%c%s","        <dia:point val=",'"',posX,',',posY,'"',"/>");
+			sprintf(linea,"%s%c%d%c%d%c%s\n","        <dia:point val=",'"',posX,',',posY,'"',"/>");
 			fputs(linea,resultado);
 		}else if(strstr(linea,"Combinado de atributos")!=NULL){//copiar fichero atributos
 			copiarFicheroAtributos(resultado);
@@ -308,6 +307,20 @@ void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 		}else if(strstr(linea,"Combinado de metodos")!=NULL){//copiar fichero metodos ¿petara por los espacios?
 			copiarFicheroMetodo(resultado);
 			fputs("\n",resultado);
+		}else if(strstr(linea,"<!--Abstracta?-->")!=NULL){//abstracta
+			if(clase->abstracta){
+				sprintf(linea,"%s%c%s%c%s","        <dia:boolean val=",'"',"true",'"',"/>");
+			}else{
+				sprintf(linea,"%s%c%s%c%s","        <dia:boolean val=",'"',"false",'"',"/>");
+			}
+			fputs(linea,resultado);
+		}else if(strstr(linea,"<!--Estereotipo-->")!=NULL){//interfaz
+			if(clase->interfaz){
+				fputs("        <dia:string>#interface#</dia:string>",resultado);
+			}else{
+				fputs("        <dia:string>##</dia:string>",resultado);
+			}
+			
 		}else{
 			fputs(linea,resultado);
 		}

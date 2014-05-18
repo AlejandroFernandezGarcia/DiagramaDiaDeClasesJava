@@ -45,8 +45,28 @@ S : package imports tipo_fichero ext_imp '{' atributos metodos '}'
 	| package imports tipo_fichero ext_imp '{' atributos '}'
 	;
 
-ext_imp: EXTENDS STRING //Flecha herenncia
-	| IMPLEMENTS STRING  //Flecha realizacion
+ext_imp: EXTENDS STRING {for(z=0;z<numTotalClases;z++){
+									if(strstr($2,nombresClases[z])!=NULL){
+										relacion rel;
+										rel.tipo=HERENCIA;
+										rel.idCabeza=z;
+										rel.idCola=numClases-1;
+										printf("--%d\n",numClases);
+										relaciones[numRelacion]=rel;
+										numRelacion++;
+									}
+								} free($2);}
+	| IMPLEMENTS STRING  {for(z=0;z<numTotalClases;z++){
+									if(strstr($2,nombresClases[z])!=NULL){
+										relacion rel;
+										rel.tipo=REALIZACION;
+										rel.idCabeza=z;
+										rel.idCola=numClases-1;
+										printf("--%d\n",numClases);
+										relaciones[numRelacion]=rel;
+										numRelacion++;
+									}
+								} free($2);}
 	| /*Vacio*/
 	;
 
@@ -62,9 +82,12 @@ imports: IMPORT STRING ';' {free($2);}
 	| 
 	;
 
-tipo_fichero : m_visibilidad CLASS STRING  {c = crearClase($3); numClases++;free($3);}
-	| m_visibilidad INTERFACE STRING 
-	| m_visibilidad ABSTRACT CLASS STRING
+tipo_fichero : m_visibilidad CLASS STRING  {c = crearClase($3,FALSE,FALSE);
+														  numClases++;free($3);}
+	| m_visibilidad INTERFACE STRING 		 {c = crearClase($3,TRUE,FALSE);
+															numClases++;free($3);}
+	| m_visibilidad ABSTRACT CLASS STRING	 {c = crearClase($4,FALSE,TRUE);
+														  numClases++;free($3);}
 	;
 	
 atributo: m_visibilidad STRING STRING ';'	{for(z=0;z<numTotalClases;z++){

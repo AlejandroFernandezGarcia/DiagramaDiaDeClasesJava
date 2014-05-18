@@ -2,12 +2,11 @@ package pepito;
 
 import pepe.lacasitos;
 
-public class Autor{
+public abstract class Autor implements Hoja{
 
     private String nombre;
     private Calendar fechaNacimiento;
     private int sueldo;
-    public Hoja libro;
     private Libro libro;
     
     public String getNombre(){

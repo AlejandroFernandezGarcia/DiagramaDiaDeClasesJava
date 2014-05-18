@@ -2,7 +2,7 @@ package pepito;
 
 import pepe.lacasitos;
 
-public class Hoja{
+public interface Hoja{
     private int numero;
     private int numeroLetras;
     
