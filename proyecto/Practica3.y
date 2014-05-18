@@ -56,20 +56,23 @@ imports: IMPORT STRING ';' {free($2);}
 clase : m_visibilidad CLASS STRING '{' {c = crearClase($3); numClases++;free($3);}
 	;
 	
-atributo: m_visibilidad STRING STRING ';'	{/*for(z=0;z<numTotalClases;z++){
+atributo: m_visibilidad STRING STRING ';'	{for(z=0;z<numTotalClases;z++){
 															if(strstr($2,nombresClases[z])!=NULL){
 																relacion rel;
 																rel.tipo=ASOCIACION;
 																rel.idCabeza=z;
-																rel.idCola=numClases;
+																rel.idCola=numClases-1;
+																printf("--%d\n",numClases);
 																relaciones[numRelacion]=rel;
 																numRelacion++;
 																control=TRUE;
 															}
 														}
-														if(!control){*/
+														if(!control){
 															at[numAtributo] = crearAtributo($3,$2,$1);
 															numAtributo++;
+														}
+														control=FALSE;
 														free($2);free($3);}
 	;
 	
@@ -143,7 +146,8 @@ int main(){
 		met = inicializarMetodo();
 		
 		/*Abrir fichero .java y asignarselo a la entrada del analizador*/
-		printf("%s",pathArchivos[i]);
+		printf("%s\n",pathArchivos[i]);
+		printf("Nombre --> %s\n",nombresClases[i]);
 		f = fopen(pathArchivos[i],"r");
 		yyin= f;
 		yyparse();
@@ -171,22 +175,23 @@ int main(){
 	}
 	printf("\n");
 
-	/**Prueba relaciones*/
+	/**Prueba relaciones
 	relacion rel;
 	rel.tipo=ASOCIACION;
 	rel.idCabeza=0;
 	rel.idCola=1;
 	numRelacion=1;
 	relaciones[0]=rel;
-	crearRelacionesXML(relaciones, numTotalClases,numRelacion);
 	
-	/*fin*/
+	fin*/
 
 	printf("Finalizado el parseo de todas las clases.\n");
 	printf("Generando %s.dia\n",nombreSalida);
+	crearRelacionesXML(relaciones, numTotalClases,numRelacion);
 	crearLayerXML(numClases,numRelacion);
 	crearFinalXML(rutaSalida,nombreSalida);
 	
+	free(relaciones);
 	free(rutaSalida);
 	free(nombreSalida);
 	liberarPathFicheros(pathArchivos);
