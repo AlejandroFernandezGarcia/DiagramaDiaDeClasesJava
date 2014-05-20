@@ -1,12 +1,11 @@
-package pepito;
+package pl;
 
-import pepe.lacasitos;
-
-public class Libro extends Hoja{
+public class Libro {
     private String titulo;
     private String campo;
     private int numeroPaginas;
-    public Autor otro;
+    public Autor libroAlQuePertenece;
+    private List<Hoja> hojas;
     
     public void verLibro(string libro){
     }

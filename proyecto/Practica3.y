@@ -51,7 +51,7 @@ ext_imp: EXTENDS STRING {for(z=0;z<numTotalClases;z++){
 										rel.tipo=HERENCIA;
 										rel.idCabeza=z;
 										rel.idCola=numClases-1;
-										printf("--%d\n",numClases);
+										//printf("--%d\n",numClases);
 										relaciones[numRelacion]=rel;
 										numRelacion++;
 									}
@@ -62,7 +62,7 @@ ext_imp: EXTENDS STRING {for(z=0;z<numTotalClases;z++){
 										rel.tipo=REALIZACION;
 										rel.idCabeza=z;
 										rel.idCola=numClases-1;
-										printf("--%d\n",numClases);
+										//printf("--%d\n",numClases);
 										relaciones[numRelacion]=rel;
 										numRelacion++;
 									}
@@ -78,7 +78,7 @@ m_visibilidad: T_PUBLIC {$$=PUBLIC;}
 	| /*Default*/ {$$=DEFAULT;}
 	;
 
-imports: IMPORT STRING ';' {free($2);}
+imports: imports IMPORT STRING ';' {free($3);}
 	| 
 	;
 
@@ -87,7 +87,7 @@ tipo_fichero : m_visibilidad CLASS STRING  {c = crearClase($3,FALSE,FALSE);
 	| m_visibilidad INTERFACE STRING 		 {c = crearClase($3,TRUE,FALSE);
 															numClases++;free($3);}
 	| m_visibilidad ABSTRACT CLASS STRING	 {c = crearClase($4,FALSE,TRUE);
-														  numClases++;free($3);}
+														  numClases++;free($4);}
 	;
 	
 atributo: m_visibilidad STRING STRING ';'	{for(z=0;z<numTotalClases;z++){
@@ -96,7 +96,7 @@ atributo: m_visibilidad STRING STRING ';'	{for(z=0;z<numTotalClases;z++){
 																rel.tipo=ASOCIACION;
 																rel.idCabeza=z;
 																rel.idCola=numClases-1;
-																printf("--%d\n",numClases);
+																//printf("--%d\n",numClases);
 																relaciones[numRelacion]=rel;
 																numRelacion++;
 																control=TRUE;
@@ -115,9 +115,9 @@ atributos: atributos atributo
 	;
 
 parametro: STRING STRING ',' {par[numMetodo][numParametro] = crearParametro($2,$1);
-										numParametro++;}
+										numParametro++;free($1);free($2);}
 	| STRING STRING {par[numMetodo][numParametro] = crearParametro($2,$1);
-						  numParametro++;}
+						  numParametro++;free($1);free($2);}
 	;
 
 parametros: parametros parametro
@@ -170,6 +170,7 @@ int main(){
 	scanf("%s",rutaSalida);
 	FILE *f;
 	system("mkdir tmp");
+	printf("\nAnalizando %d ficheros JAVA\n",numTotalClases);
 	while(pathArchivos[i] != NULL){
 		/*Inicializar estructuras antes de cada parseo*/
 		numAtributo=0;
@@ -180,8 +181,7 @@ int main(){
 		met = inicializarMetodo();
 		
 		/*Abrir fichero .java y asignarselo a la entrada del analizador*/
-		printf("%s\n",pathArchivos[i]);
-		printf("Nombre --> %s\n",nombresClases[i]);
+		printf(".");
 		f = fopen(pathArchivos[i],"r");
 		yyin= f;
 		yyparse();
@@ -204,22 +204,11 @@ int main(){
 		system("rm -f tmp/parametros*.xml");
 		
 		i++;
-		//break;
 		fclose(f);
 	}
 	printf("\n");
 
-	/**Prueba relaciones
-	relacion rel;
-	rel.tipo=ASOCIACION;
-	rel.idCabeza=0;
-	rel.idCola=1;
-	numRelacion=1;
-	relaciones[0]=rel;
-	
-	fin*/
-
-	printf("Finalizado el parseo de todas las clases.\n");
+	printf("\nFinalizado el parseo de todas las clases.\n");
 	printf("Generando %s.dia\n",nombreSalida);
 	crearRelacionesXML(relaciones, numTotalClases,numRelacion);
 	crearLayerXML(numClases,numRelacion);

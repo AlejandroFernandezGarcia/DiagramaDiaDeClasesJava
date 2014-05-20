@@ -33,11 +33,12 @@ class {return CLASS;}
 \, {return ',';}
 
 {string}	{
-	p=(char*) malloc(sizeof(char)*(strlen(yytext)));
+	p=(char*) malloc(sizeof(char)*(200));
 	strcpy(p,yytext);
 	yylval.valChar = p;
 	return STRING;
 }
 \n
 \x20
+\x9
 %%
