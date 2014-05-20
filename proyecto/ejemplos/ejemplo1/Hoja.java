@@ -1,13 +1,11 @@
-package pepito;
+package pl;
 
-import pepe.lacasitos;
+import prueba.prueba;
 
-public interface Hoja{
-    private int numero;
-    private int numeroLetras;
-    
-    public void verPagina(){
-    
-    }
-    
+public class Hoja{
+	private int numero;
+
+	public void verPagina(){
+
+	}
 }

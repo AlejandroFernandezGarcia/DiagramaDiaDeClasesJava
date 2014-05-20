@@ -4,7 +4,7 @@
 #define TRUE 1
 #define FALSE 0
 
-#define TAM_MAX 40//20 es lo suficientemente grande?
+#define TAM_MAX 50//20 es lo suficientemente grande?
 
 atributo* crearAtributo(char *nombre, char *tipo,int visibilidad){
 	atributo *at;
@@ -42,14 +42,14 @@ metodo* crearMetodo(char *nombre,char *tipo, int visibilidad){
 }
 
 clase* crearClase(char *nombre, int interfaz, int abstracta){/*Hace falta puntero¿?¿?*/
-	clase *clase;
-	clase = malloc(sizeof(clase));
-	clase->nombre = malloc(sizeof(char)*200);
+	clase *c;
+	c = (clase*) malloc(sizeof(clase));
+	c->nombre = malloc(sizeof(char)*200);
 	
-	strcpy(clase->nombre,nombre);
-	clase->interfaz = interfaz;
-	clase->abstracta = abstracta;
-	return clase;
+	strcpy(c->nombre,nombre);
+	c->interfaz = interfaz;
+	c->abstracta = abstracta;
+	return c;
 }
 
 void copiarFicheroAtributos(FILE *resultado){
@@ -156,7 +156,7 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 					posX= 20*((relaciones[relacionActual].idCola)%(numeroTotalDeClases/2))+4;
 					posY= 15;
 				}
-				sprintf(aux,"%s%c%d,%d%c%s","<dia:point val=",'"',posX,posY,'"',"/>");
+				sprintf(aux,"%s%c%d,%d%c%s\n","<dia:point val=",'"',posX,posY,'"',"/>");
 				fputs(aux,resultado);
 			}else if(strstr(linea,"<!--ConexionCabeza-->") != NULL){
 				if(((float)numeroTotalDeClases/2)>relaciones[relacionActual].idCabeza){
@@ -166,7 +166,7 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 					posX= 20*((relaciones[relacionActual].idCabeza)%(numeroTotalDeClases/2))+4;
 					posY= 15;
 				}
-				sprintf(aux,"%s%c%d,%d%c%s","<dia:point val=",'"',posX,posY,'"',"/>");
+				sprintf(aux,"%s%c%d,%d%c%s\n","<dia:point val=",'"',posX,posY,'"',"/>");
 				fputs(aux,resultado);
 			}else if(strstr(linea,"<!--Estilo de linea-->") != NULL){
 				switch(relaciones[relacionActual].tipo){
@@ -248,7 +248,7 @@ void crearLayerXML(int numeroTotalDeClases,int numRelacion){
 		relacionActual++;
 		fclose(f);
 	}
-	fputs("  </dia:layer>",resultado);
+	fputs("  </dia:layer>\n",resultado);
 	fclose(resultado);
 	free(linea);
 }
@@ -309,16 +309,16 @@ void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 			fputs("\n",resultado);
 		}else if(strstr(linea,"<!--Abstracta?-->")!=NULL){//abstracta
 			if(clase->abstracta){
-				sprintf(linea,"%s%c%s%c%s","        <dia:boolean val=",'"',"true",'"',"/>");
+				sprintf(linea,"%s%c%s%c%s\n","        <dia:boolean val=",'"',"true",'"',"/>");
 			}else{
-				sprintf(linea,"%s%c%s%c%s","        <dia:boolean val=",'"',"false",'"',"/>");
+				sprintf(linea,"%s%c%s%c%s\n","        <dia:boolean val=",'"',"false",'"',"/>");
 			}
 			fputs(linea,resultado);
 		}else if(strstr(linea,"<!--Estereotipo-->")!=NULL){//interfaz
 			if(clase->interfaz){
-				fputs("        <dia:string>#interface#</dia:string>",resultado);
+				fputs("        <dia:string>#interface#</dia:string>\n",resultado);
 			}else{
-				fputs("        <dia:string>##</dia:string>",resultado);
+				fputs("        <dia:string>##</dia:string>\n",resultado);
 			}
 			
 		}else{

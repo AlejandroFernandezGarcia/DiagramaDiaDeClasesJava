@@ -1,13 +1,13 @@
-package pepito;
+package pl;
 
-import pepe.lacasitos;
+import java.util.Calendar;
 
-public abstract class Autor implements Hoja{
+public class Autor{
 
     private String nombre;
     private Calendar fechaNacimiento;
     private int sueldo;
-    private Libro libro;
+    private List<Libro> listaLibros;
     
     public String getNombre(){
     	this.nombre = nombre;

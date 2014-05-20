@@ -65,7 +65,6 @@ char **obtenerPathFicheros(const char *extension,int *numTotalClases,char **nomb
 		perror("Error");
 		exit(1);
 	}else{
-		//printf(" no Error\n");
 		numArchivos = contarFicheros(directorio,extension);
 		pathArchivos = (char**) malloc((1+numArchivos)*sizeof(char*));
 		int w;
@@ -83,7 +82,6 @@ char **obtenerPathFicheros(const char *extension,int *numTotalClases,char **nomb
 				aux[strlen(aux)-5]='\0';
 				strcpy(nombres[archivoActual],aux);
 				
-				printf("->%s\n",pathArchivos[archivoActual]);
 				archivoActual++;
 			}
 			ldir = readdir(dir);
