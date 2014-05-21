@@ -3,6 +3,7 @@
 	#include "Xml.c"
 	#include <stdio.h>
 	void yyerror (char const *);
+	void sumarError();
 	extern FILE *yyin;
 	atributo** at;
 	parametro ***par;
@@ -18,6 +19,7 @@
 	int numTotalClases=0;
 	int z;
 	int control=FALSE;
+	int errorParseando=1;
 	
 %}
 %union{
@@ -43,31 +45,39 @@
 S : package imports tipo_fichero ext_imp '{' atributos metodos '}' 
 	| package imports tipo_fichero ext_imp '{' metodos '}'
 	| package imports tipo_fichero ext_imp '{' atributos '}'
+	| package imports tipo_fichero ext_imp '{' firmas_metodos '}'
+	| package imports tipo_fichero ext_imp '{' metodos atributos '}' {yyerror("los atributos tienen que ir antes que los métodos.");sumarError();}
 	;
 
-ext_imp: EXTENDS STRING {for(z=0;z<numTotalClases;z++){
-									if(strstr($2,nombresClases[z])!=NULL){
-										relacion rel;
-										rel.tipo=HERENCIA;
-										rel.idCabeza=z;
-										rel.idCola=numClases-1;
-										//printf("--%d\n",numClases);
-										relaciones[numRelacion]=rel;
-										numRelacion++;
-									}
-								} free($2);}
-	| IMPLEMENTS STRING  {for(z=0;z<numTotalClases;z++){
-									if(strstr($2,nombresClases[z])!=NULL){
-										relacion rel;
-										rel.tipo=REALIZACION;
-										rel.idCabeza=z;
-										rel.idCola=numClases-1;
-										//printf("--%d\n",numClases);
-										relaciones[numRelacion]=rel;
-										numRelacion++;
-									}
-								} free($2);}
-	| /*Vacio*/
+string_com: string_com ',' STRING {yyerror("no puede haber varios clases separadas por comas en el implements/extends.");sumarError();} 
+	| /*Vacio: Esta bien el extends/implements */
+	;
+ext_imp: EXTENDS STRING string_com {for(z=0;z<numTotalClases;z++){
+												if(strcmp($2,nombresClases[z])==0){
+													relacion rel;
+													rel.tipo=HERENCIA;
+													rel.idCabeza=z;
+													rel.idCola=numClases-1;
+													//printf("--%d\n",numClases);
+													relaciones[numRelacion]=rel;
+													numRelacion++;
+												}
+											} free($2);}
+	| IMPLEMENTS STRING  string_com {for(z=0;z<numTotalClases;z++){
+												if(strcmp($2,nombresClases[z])==0){
+													relacion rel;
+													rel.tipo=REALIZACION;
+													rel.idCabeza=z;
+													rel.idCola=numClases-1;
+													//printf("|%s|",$2);
+													//printf("--%d\n",numClases);
+													relaciones[numRelacion]=rel;
+													numRelacion++;
+												}
+											} free($2);}
+	| IMPLEMENTS STRING string_com EXTENDS STRING string_com {yyerror("no puede haber implements y extends al mismo tiempo.");sumarError();} 
+	| EXTENDS STRING string_com IMPLEMENTS STRING string_com {yyerror("no puede haber implements y extends al mismo tiempo.");sumarError();} 
+	| /*Vacio: No hay ni extends ni implements.*/
 	;
 
 package: PACKAGE STRING ';' {free($2);};
@@ -131,6 +141,25 @@ relleno_metodo: relleno_metodo STRING {free($2);}
 	//| /*Metodo vacio*/
 	;
 
+/*Revisar firmas_metodos*/
+firmas_metodos: firmas_metodos m_visibilidad STRING STRING '(' parametros ')' ';' {met[numMetodo] = crearMetodo($4,$3,$2);
+																											  numMetodo++;
+																											  numParametro=0;
+																											  free($3);free($4);}
+	| m_visibilidad STRING STRING '(' parametros ')' ';' 	{met[numMetodo] = crearMetodo($3,$2,$1);
+																			 numMetodo++;
+																			 numParametro=0;
+																			 free($2);free($3);}
+	| firmas_metodos m_visibilidad STRING STRING '(' ')' ';'  {met[numMetodo] = crearMetodo($4,$3,$2);
+																				  numMetodo++;
+																				  numParametro=0;
+																				  free($3);free($4);}
+	| m_visibilidad STRING STRING '(' ')' ';'	  {met[numMetodo] = crearMetodo($3,$2,$1);
+																numMetodo++;
+																numParametro=0;
+																free($2);free($3);}
+	;
+
 metodo: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);
 																										  numMetodo++;
 																										  numParametro=0;
@@ -181,7 +210,6 @@ int main(){
 		met = inicializarMetodo();
 		
 		/*Abrir fichero .java y asignarselo a la entrada del analizador*/
-		printf(".");
 		f = fopen(pathArchivos[i],"r");
 		yyin= f;
 		yyparse();
@@ -206,13 +234,19 @@ int main(){
 		i++;
 		fclose(f);
 	}
-	printf("\n");
-
-	printf("\nFinalizado el parseo de todas las clases.\n");
-	printf("Generando %s.dia\n",nombreSalida);
-	crearRelacionesXML(relaciones, numTotalClases,numRelacion);
-	crearLayerXML(numClases,numRelacion);
-	crearFinalXML(rutaSalida,nombreSalida);
+	//printf("\nError------->%d\n",errorParseando);
+	if(errorParseando==1){
+		printf("%d de %d ficheros analizados\n",numClases,numTotalClases);
+	
+		printf("\nFinalizado el parseo de todas las clases.\n");
+		printf("Generado %s.dia\n",nombreSalida);
+	
+		crearRelacionesXML(relaciones, numTotalClases,numRelacion);	
+		crearLayerXML(numClases,numRelacion);
+		crearFinalXML(rutaSalida,nombreSalida);
+	}else{
+		printf("\nNo se ha podido generar el fichero .dia\n");
+	}
 	
 	free(relaciones);
 	free(rutaSalida);
@@ -220,14 +254,19 @@ int main(){
 	liberarPathFicheros(pathArchivos);
 	liberarPathFicheros(nombresClases);
 	
-	printf("--->Done.\n");
 	system("rm -fR tmp");
 	
 	return 0;
 }
 
 void yyerror (char const *message) { 
-	fprintf (stderr,"%s\n", message);
+	if(errorParseando>1){
+		printf ("-Error en %c%s%c: %s\n",'"',c->nombre,'"',message);
+	}else{
+		printf ("\n-Error en %c%s%c: %s\n",'"',c->nombre,'"',message);
+	}
 }
-//para el modificador default no se pone nada
-//es un error poner algo
+void sumarError(){
+	errorParseando++;
+}
+

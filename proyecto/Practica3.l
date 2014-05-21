@@ -11,6 +11,7 @@
 string [^\x2C\t\n\x3B\x20\x28\x29\x7B\x7D]+
 comas [\x2C]
 %%
+"/*""/"*([^*/]|[^*]"/"|"*"[^/])*"*"*"*/"
 package {return PACKAGE;}
 import {return IMPORT;}
 
