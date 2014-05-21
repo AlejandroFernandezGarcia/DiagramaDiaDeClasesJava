@@ -195,6 +195,7 @@ int main(){
 	const char extension[6] = ".java";
 	char **pathArchivos;
 	int i=0;
+	int errorYparse=0;
 	char *rutaSalida,*nombreSalida;
 	nombresClases = (char**) malloc(TAM_MAX*sizeof(char*));
 	pathArchivos = obtenerPathFicheros(extension,&numTotalClases,nombresClases);
@@ -220,22 +221,24 @@ int main(){
 		/*Abrir fichero .java y asignarselo a la entrada del analizador*/
 		f = fopen(pathArchivos[i],"r");
 		yyin= f;
-		yyparse();
+		errorYparse += yyparse();
+		errorParseando = errorParseando + errorYparse;
 		
 		/*Crea los XML intermedios generandolos a partir de las estructuras*/
 		crearAtributosXML(at);
-		liberarAtributos(at);
-		
 		crearParametrosXML(par);
-		liberarParametros(par);
-				
 		crearMetodoXML(met);
+		
+		liberarAtributos(at);
+		liberarParametros(par);
 		liberarMetodos(met);
+				
 
 		crearClaseXML(c,i,numTotalClases);
-		
-		free(c->nombre);
-		free(c);
+		if(errorYparse==0){
+			free(c->nombre);
+			free(c);
+		}
 		
 		system("rm -f tmp/parametros*.xml");
 		
