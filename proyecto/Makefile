@@ -14,5 +14,24 @@ test1: all
 test2: all
 	./$(SOURCE) < ejemplos/Ejemplo2	
 	
+test3: all
+	./$(SOURCE) < ejemplos/Ejemplo3	
+	
+test4: all
+	./$(SOURCE) < ejemplos/Ejemplo4	
+	
+test5: all
+	./$(SOURCE) < ejemplos/Ejemplo5
+
+test6: all
+	./$(SOURCE) < ejemplos/Ejemplo6
+	
+test7: all
+	./$(SOURCE) < ejemplos/Ejemplo7
+	
+test8: all
+	./$(SOURCE) < ejemplos/Ejemplo8
+	
+
 clean:
 	rm -f $(SOURCE) lex.yy.c $(SOURCE).tab.c $(SOURCE).tab.h *.*~ *~ *.gch *.o *.dia

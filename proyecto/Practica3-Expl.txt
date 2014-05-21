@@ -9,3 +9,5 @@ Cada clase en un fichero.
 Para hacer algun tipo de gestión de errores se ha acotado algunas cosas
 
 Plantillas
+
+No usar <> en los nombres
