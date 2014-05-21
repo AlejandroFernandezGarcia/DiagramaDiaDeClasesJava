@@ -10,6 +10,7 @@
 #define TRUE 1
 #define FALSE 0
 
+/*Comprueba la extension de un archivo*/
 int comprobarExtension(char *nombre, char const *extension){
 	if(strstr(nombre,extension)!=NULL){
 		if(nombre[strlen(nombre)-1]=='~'){
@@ -21,6 +22,7 @@ int comprobarExtension(char *nombre, char const *extension){
 	}
 }
 
+/*Cuenta los ficheros con la extension correcta dentro de un directorio*/
 int contarFicheros(char const *directorio,char const *extension){
 	DIR *auxDir;
 	struct dirent *auxLdir;
@@ -46,8 +48,8 @@ void liberarPathFicheros(char **pathFicheros){
 	free(pathFicheros);
 }
 
+/*Obtiene las rutas hacia todos los ficheros .java dentro del directorio indicado*/
 char **obtenerPathFicheros(const char *extension,int *numTotalClases,char **nombresClases){
-	// /home/alejandro/NetBeansProjects/ER-12-04/src/interfazUsuario/escritorio
 	char **pathArchivos;
 	char *aux;
 	int numArchivos=0;
@@ -86,21 +88,13 @@ char **obtenerPathFicheros(const char *extension,int *numTotalClases,char **nomb
 			}
 			ldir = readdir(dir);
 		}
-		//pathArchivos[numArchivos+1] = NULL;//?
 	}
 	if(closedir(dir)==-1){
 		printf("Error closedir\n");
 	}
 	nombres[*numTotalClases]=NULL;
-	//hacer frees
 	free(directorio);
 	free(aux);
 	
 	return pathArchivos;
 }
-
-/*int main(){
-	char **pathArchivos = obtenerPathFicheros(".java");
-	liberarPathFicheros(pathArchivos);
-	return 1;
-}*/

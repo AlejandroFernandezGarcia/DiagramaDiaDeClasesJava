@@ -2,11 +2,6 @@
 	#include <stdlib.h>
 	#include "Practica3.tab.h"
 	char *p;
-	//me falta escapar lo de package
-	//escapar comentarios
-	//escapar contenido de metodos
-	//escapar imports
-	//free del p?
 %}
 string [^\x2C\t\n\x3B\x20\x28\x29\x7B\x7D]+
 comas [\x2C]

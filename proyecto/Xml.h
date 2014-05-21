@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 
+/*Modificadores de visibilidad*/
 #define PRIVATE 1
 #define PUBLIC 0
 #define DEFAULT 3
 #define PROTECTED 2
 
+/*Tipos de relaciones*/
 #define ASOCIACION 10
 #define HERENCIA 11
 #define REALIZACION 12

@@ -4,8 +4,11 @@
 #define TRUE 1
 #define FALSE 0
 
-#define TAM_MAX 50//20 es lo suficientemente grande?
+/*Tamano maximo de las estructuras que necesitan inicializacion estatica.
+Esto quiere decir 50 clases, 50 atributos por clase, ...*/
+#define TAM_MAX 50
 
+/*Los crear* reservan el espacio ademas de asignar valores iniciales*/
 atributo* crearAtributo(char *nombre, char *tipo,int visibilidad){
 	atributo *at;
 	at = malloc (sizeof(atributo));
@@ -41,7 +44,7 @@ metodo* crearMetodo(char *nombre,char *tipo, int visibilidad){
 	return met; 
 }
 
-clase* crearClase(char *nombre, int interfaz, int abstracta){/*Hace falta puntero¿?¿?*/
+clase* crearClase(char *nombre, int interfaz, int abstracta){
 	clase *c;
 	c = (clase*) malloc(sizeof(clase));
 	c->nombre = malloc(sizeof(char)*200);
@@ -52,6 +55,8 @@ clase* crearClase(char *nombre, int interfaz, int abstracta){/*Hace falta punter
 	return c;
 }
 
+/*Los copiar* sirven para copiar los ficheros XML intermedios
+a otro XML de un nivel superior*/
 void copiarFicheroAtributos(FILE *resultado){
 	FILE *f;
 	char *linea,*aux;
@@ -94,6 +99,7 @@ void copiarFicheroLayer(FILE *resultado){
 	free(linea);
 }
 
+/*Los crear*XML crean el XML a partir de las plantillas*/
 void crearFinalXML(char *path, char *nombre){
 	FILE *f;
 	FILE *resultado;
@@ -144,10 +150,12 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 		aux = fgets(linea,200,f);
 		while(aux != NULL){
 			aux = malloc (sizeof(char)*200);
+			/*Id de la flecha*/
 			if(strstr(linea,"<!--IdFlecha-->") != NULL){
 				sprintf(aux,"%s%c%s%c%s%c%d%c%s%c%c%d%c%s\n","    <dia:object type=",'"',"Standard - Line",'"'
 															," version=",'"',0,'"'," id=",'"','O',relacionActual+numeroTotalDeClases,'"',">");
 				fputs(aux,resultado);
+			/*Posicion de la cola de la flecha*/
 			}else if(strstr(linea,"<!--ConexionCola-->") != NULL){
 				if(((float)numeroTotalDeClases/2)>relaciones[relacionActual].idCola){
 					posX= 20*(relaciones[relacionActual].idCola)+4;
@@ -158,6 +166,7 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 				}
 				sprintf(aux,"%s%c%d,%d%c%s\n","<dia:point val=",'"',posX,posY,'"',"/>");
 				fputs(aux,resultado);
+			/*Posicion de la cabeza de la flecha*/
 			}else if(strstr(linea,"<!--ConexionCabeza-->") != NULL){
 				if(((float)numeroTotalDeClases/2)>relaciones[relacionActual].idCabeza){
 					posX= 20*(relaciones[relacionActual].idCabeza)+4;
@@ -168,6 +177,7 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 				}
 				sprintf(aux,"%s%c%d,%d%c%s\n","<dia:point val=",'"',posX,posY,'"',"/>");
 				fputs(aux,resultado);
+			/*Estilo de la flecha*/
 			}else if(strstr(linea,"<!--Estilo de linea-->") != NULL){
 				switch(relaciones[relacionActual].tipo){
 					case ASOCIACION:
@@ -181,6 +191,7 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 					break;
 				}
 				fputs(aux,resultado);
+			/*Cabeza de la flecha*/
 			}else if(strstr(linea,"<!--Cabeza de la linea-->") != NULL){
 				switch(relaciones[relacionActual].tipo){
 					case ASOCIACION:
@@ -208,6 +219,7 @@ void crearRelacionesXML(relacion *relaciones, int numeroTotalDeClases, int numer
 	free(linea);
 }
 
+/*Crea el layer sobre el que van las clases y las flechas*/
 void crearLayerXML(int numeroTotalDeClases,int numRelacion){
 	FILE *f;
 	FILE *resultado;
@@ -221,7 +233,6 @@ void crearLayerXML(int numeroTotalDeClases,int numRelacion){
 	" visible=",'"',"true",'"'," active=",'"',"true",'"',">");
 	fputs(aux,resultado);
 	free(aux);
-	//añadir las relaciones tambien
 	while(ficheroActual < numeroTotalDeClases){
 		aux = malloc (sizeof(char)*200);
 		sprintf(aux,"%s%d%s","tmp/clase",ficheroActual,".xml");
@@ -273,13 +284,16 @@ void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 	}
 	aux = fgets(linea,200,f);
 	while(aux != NULL){
-		if(strstr(linea,"<!--IdClase-->")!=NULL){//idClase
+		/*Id de la clase*/
+		if(strstr(linea,"<!--IdClase-->")!=NULL){
 			sprintf(linea,"%s%c%s%c%s%c%d%c%s%c%c%d%c%s\n","    <dia:object type=",'"',"UML - Class",'"'," version=",'"',0,'"'," id=",'"','O',numeroClase,'"',">");
 			fputs(linea,resultado);
-		}else	if(strstr(linea,"<!--<dia:string>#NombreClase#</dia:string>-->")!=NULL){//nombre
+		/*Nombre de la clase*/
+		}else	if(strstr(linea,"<!--<dia:string>#NombreClase#</dia:string>-->")!=NULL){
 			sprintf(linea,"%s%s%s\n","        <dia:string>#",clase->nombre,"#</dia:string>");
 			fputs(linea,resultado);
-		}else if(strstr(linea,"Posicion-->")!=NULL){//posicion
+		/*Posicion de la clase en el layer*/
+		}else if(strstr(linea,"Posicion-->")!=NULL){
 			if(numeroClase==0){
 				posX=0;
 				posY=0;
@@ -291,30 +305,27 @@ void crearClaseXML(clase *clase,int numeroClase, int numTotalClases){
 					posX= 20*((numeroClase)%(numTotalClases/2));
 					posY= 15;
 				}
-				/*if((numTotalClases/2)>numeroClase){
-					posX= 15*numeroClase;
-					posY=	0;
-				}else{
-					posX= 15*((numeroClase)%(numTotalClases/2));
-					posY= 10;
-				}*/
 			}
 			sprintf(linea,"%s%c%d%c%d%c%s\n","        <dia:point val=",'"',posX,',',posY,'"',"/>");
 			fputs(linea,resultado);
-		}else if(strstr(linea,"Combinado de atributos")!=NULL){//copiar fichero atributos
+		/*Agrega atributos a la clase*/
+		}else if(strstr(linea,"Combinado de atributos")!=NULL){
 			copiarFicheroAtributos(resultado);
 			fputs("\n",resultado);
-		}else if(strstr(linea,"Combinado de metodos")!=NULL){//copiar fichero metodos ¿petara por los espacios?
+		/*Agrega metodos a las clases*/
+		}else if(strstr(linea,"Combinado de metodos")!=NULL){
 			copiarFicheroMetodo(resultado);
 			fputs("\n",resultado);
-		}else if(strstr(linea,"<!--Abstracta?-->")!=NULL){//abstracta
+		/*Abstracta*/
+		}else if(strstr(linea,"<!--Abstracta?-->")!=NULL){
 			if(clase->abstracta){
 				sprintf(linea,"%s%c%s%c%s\n","        <dia:boolean val=",'"',"true",'"',"/>");
 			}else{
 				sprintf(linea,"%s%c%s%c%s\n","        <dia:boolean val=",'"',"false",'"',"/>");
 			}
 			fputs(linea,resultado);
-		}else if(strstr(linea,"<!--Estereotipo-->")!=NULL){//interfaz
+		/*Estereotipo, en esta caso para poner interface*/
+		}else if(strstr(linea,"<!--Estereotipo-->")!=NULL){
 			if(clase->interfaz){
 				fputs("        <dia:string>#interface#</dia:string>\n",resultado);
 			}else{
@@ -350,24 +361,21 @@ void crearAtributosXML(atributo **lAt){
 		exit(1);
 	}
 	while((lAt[i] != NULL) && (i < TAM_MAX)){
-		
-		//recorrer linea a linea
 		aux = fgets(linea,200,f);
 		while(aux != NULL){
+			/*Nombre del atributo*/
 			if(strstr(linea,"<!--<dia:string>#NombreAtributo#</dia:string>-->")!=NULL){
 				sprintf(linea,"%s%s%s\n","            <dia:string>#",lAt[i]->nombre,"#</dia:string>");
+			/*Tipo del atributo*/
 			}else if(strstr(linea,"<!--<dia:string>#TipoSegundoAtributo#</dia:string>-->")!=NULL){
 				sprintf(linea,"%s%s%s\n","            <dia:string>#",lAt[i]->tipo,"#</dia:string>");
+			/*Visibilidad del atributo*/
 			}else if(strstr(linea,"/>Privacidad-->")!=NULL){
 				sprintf(linea,"%s%c%d%c%s\n","            <dia:enum val=",'"',lAt[i]->visibilidad,'"',"/>");
 			}
-			
-			//printf("%s",linea);
 			fputs(linea,resultado);
 			aux = fgets(linea,200,f);
 		}
-		//escribirlo en otro fichero
-		//printf("---->%s",linea);
 		rewind(f);
 		i++;
 	}
@@ -386,8 +394,7 @@ void crearParametrosXML(parametro ***lPar){
 	f = fopen("plantillas/parametrosMetodo.xml","r");
 	while((lPar[numMetodo]!=NULL) && (numMetodo < TAM_MAX)){
 		i=0;
-		
-		aux = malloc(200*sizeof(char));//¿?¿?¿?¿Le habia puesto 500
+		aux = malloc(200*sizeof(char));
 		sprintf(aux,"%s%d%s","tmp/parametros",numMetodo,".xml");
 		resultado = fopen(aux,"w");
 		sprintf(aux,"%s%c%s%c%s\n","          <dia:attribute name=",'"',"parameters",'"',">");
@@ -398,22 +405,18 @@ void crearParametrosXML(parametro ***lPar){
 			exit(1);
 		}
 		while((lPar[numMetodo][i] != NULL) && (i < TAM_MAX)){
-		
-			//recorrer linea a linea
 			aux = fgets(linea,200,f);
 			while(aux != NULL){
+				/*Nombre parametro*/
 				if(strstr(linea,"<!--<dia:string>#NombreParametro#</dia:string>-->")!=NULL){
 					sprintf(linea,"%s%s%s\n","                <dia:string>#",lPar[numMetodo][i]->nombre,"#</dia:string>");
+				/*Tipo parametro*/
 				}else if(strstr(linea,"<!--<dia:string>#TipoParametro#</dia:string>-->")!=NULL){
 					sprintf(linea,"%s%s%s\n","                <dia:string>#",lPar[numMetodo][i]->tipo,"#</dia:string>");
 				}
-			
-				//printf("%s",linea);
 				fputs(linea,resultado);
 				aux = fgets(linea,200,f);
 			}
-			//escribirlo en otro fichero
-			//printf("---->%s",linea);
 			rewind(f);
 			i++;
 		}
@@ -462,30 +465,28 @@ void crearMetodoXML(metodo **lMet){
 	}
 	linea = malloc (200*sizeof(char));
 	while((lMet[i] != NULL) && (i < 2)){
-		//recorrer linea a linea
 		aux = fgets(linea,200,f);
 		while(aux != NULL){
+			/*Nombre del metodo*/
 			if(strstr(linea,"<!--<dia:string>#NombreMetodo#</dia:string>-->")!=NULL){
 				sprintf(linea,"%s%s%s\n","            <dia:string>#",lMet[i]->nombre,"#</dia:string>");
 				fputs(linea,resultado);
+			/*Tipo de metodo*/
 			}else if(strstr(linea,"<!--<dia:string>#TipoMetodo#</dia:string>-->")!=NULL){
 				sprintf(linea,"%s%s%s\n","            <dia:string>#",lMet[i]->tipo,"#</dia:string>");
 				fputs(linea,resultado);
+			/*Visibilidad del metodo*/
 			}else if(strstr(linea,">Visibilidad-->")!=NULL){
 				sprintf(linea,"%s%c%d%c%s\n","            <dia:enum val=",'"',lMet[i]->visibilidad,'"',"/>");
 				fputs(linea,resultado);
+			/*Anade los parametros al metodo*/
 			}else if(strstr(linea,"<!--Aqui va combinar parametros-->")!=NULL){
 				copiarFicherosParametros(resultado,i);
-				//fputs("\n",resultado);
 			}else{
 				fputs(linea,resultado);
 			}
-			//printf("%s",linea);
-			
 			aux = fgets(linea,200,f);
 		}
-		//escribirlo en otro fichero
-		//printf("---->%s",linea);
 		rewind(f);
 		i++;
 	}
@@ -493,7 +494,6 @@ void crearMetodoXML(metodo **lMet){
 	fclose(f);
 	fclose(resultado);
 	free(linea);
-	//system("rm tmp/parametros*.xml");
 }
 
 
@@ -537,6 +537,7 @@ void liberarAtributos(atributo **at){
 	free(at);
 }
 
+/*Inicializar* inicializan las estructuras que son como minimo matrices*/
 atributo** inicializarAtributos(){
 	int i=0;
 	atributo** at;
@@ -576,42 +577,3 @@ metodo** inicializarMetodo(){
 	}
 	return met;
 }
-
-/*int main(){
-	system("mkdir tmp");
-	
-	atributo** at = inicializarAtributos();
-	parametro ***par = inicializarParametro();
-	metodo** met = inicializarMetodo();
-	
-	at[0] = crearAtributo("Nombre1","tipo1",PUBLIC);
-	at[1] = crearAtributo("Nombre2","tipo2",PRIVATE);
-	par[0][0] = crearParametro("Nombre1","tipo1");
-	par[0][1] = crearParametro("Nombre2","tipo2");
-	par[1][0] = crearParametro("Nombre1","tipo1");
-	par[1][1] = crearParametro("Nombre2","tipo3");
-	met[0] = crearMetodo("Nombre1","tipo1",PUBLIC);
-	met[1] = crearMetodo("Nombre2","tipo2",PRIVATE);
-	
-	clase *c;
-	c = crearClase("PrimeraClase");
-	
-	crearAtributosXML(at);
-	crearParametrosXML(par);
-	crearMetodoXML(met);
-	crearClaseXML(c,0);
-	
-	
-	free(c->nombre);
-	free(c);
-	liberarParametros(par);
-	liberarAtributos(at);
-	liberarMetodos(met);
-	
-	crearLayerXML(1);
-	crearFinalXML(".", "Diagrama");
-	
-	printf("--->Done.\n");
-	system("rm -fR tmp");
-	return 0;
-}*/
