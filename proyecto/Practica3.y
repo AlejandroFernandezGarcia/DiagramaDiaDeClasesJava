@@ -160,6 +160,12 @@ firmas_metodos: firmas_metodos m_visibilidad STRING STRING '(' parametros ')' ';
 																free($2);free($3);}
 	;
 
+constructor: m_visibilidad STRING '(' parametros ')' '{' relleno_metodo '}' 
+	| m_visibilidad STRING '(' ')' '{' relleno_metodo '}' 
+	| m_visibilidad STRING '(' parametros ')' '{' '}' 
+	| m_visibilidad STRING '(' ')' '{' '}'
+	; 
+
 metodo: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {met[numMetodo] = crearMetodo($3,$2,$1);
 																										  numMetodo++;
 																										  numParametro=0;
@@ -180,6 +186,8 @@ metodo: m_visibilidad STRING STRING '(' parametros ')' '{' relleno_metodo '}' {m
 
 metodos: metodos metodo
 	| metodo
+	| metodos constructor {yyerror("no puede haber ningún constructor.");sumarError();} 
+	| constructor {yyerror("no puede haber ningún constructor.");sumarError();} 
 	;
 
 %%
