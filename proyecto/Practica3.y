@@ -42,6 +42,7 @@
 %type <valInt> m_visibilidad
 %start S
 %%
+/*Estructura principal de cada fichero*/
 S : package imports tipo_fichero ext_imp '{' atributos metodos '}' 
 	| package imports tipo_fichero ext_imp '{' metodos '}'
 	| package imports tipo_fichero ext_imp '{' atributos '}'
@@ -49,9 +50,12 @@ S : package imports tipo_fichero ext_imp '{' atributos metodos '}'
 	| package imports tipo_fichero ext_imp '{' metodos atributos '}' {yyerror("los atributos tienen que ir antes que los métodos.");sumarError();}
 	;
 
+/*Extends e implements con comas*/
 string_com: string_com ',' STRING {yyerror("no puede haber varios clases separadas por comas en el implements/extends.");sumarError();} 
 	| /*Vacio: Esta bien el extends/implements */
 	;
+
+/*Extends e implements, por separado y juntos*/
 ext_imp: EXTENDS STRING string_com {for(z=0;z<numTotalClases;z++){
 												if(strcmp($2,nombresClases[z])==0){
 													relacion rel;
@@ -82,6 +86,7 @@ ext_imp: EXTENDS STRING string_com {for(z=0;z<numTotalClases;z++){
 
 package: PACKAGE STRING ';' {free($2);};
 
+/*Visibilidad de metodos, atributos y clases*/
 m_visibilidad: T_PUBLIC {$$=PUBLIC;}
 	| T_PRIVATE {$$=PRIVATE;}
 	| T_PROTECTED {$$=PROTECTED;}
@@ -89,9 +94,10 @@ m_visibilidad: T_PUBLIC {$$=PUBLIC;}
 	;
 
 imports: imports IMPORT STRING ';' {free($3);}
-	| 
+	| /*Vacio: No hay imports o fin de recursividad*/ 
 	;
 
+/*Diferencia entre clase, interfaz y clase abstracta*/
 tipo_fichero : m_visibilidad CLASS STRING  {c = crearClase($3,FALSE,FALSE);
 														  numClases++;free($3);}
 	| m_visibilidad INTERFACE STRING 		 {c = crearClase($3,TRUE,FALSE);
@@ -124,6 +130,7 @@ atributos: atributos atributo
 	| atributo
 	;
 
+/*Parametro de los metodos y constructores*/
 parametro: STRING STRING ',' {par[numMetodo][numParametro] = crearParametro($2,$1);
 										numParametro++;free($1);free($2);}
 	| STRING STRING {par[numMetodo][numParametro] = crearParametro($2,$1);
@@ -133,15 +140,15 @@ parametro: STRING STRING ',' {par[numMetodo][numParametro] = crearParametro($2,$
 parametros: parametros parametro
 	| parametro
 	;
-	
+
+/*Escapa el relleno de los metodos*/
 relleno_metodo: relleno_metodo STRING {free($2);}
 	| relleno_metodo STRING ';' {free($2);}
 	| STRING {free($1);}
 	| STRING ';' {free($1);}
-	//| /*Metodo vacio*/
 	;
 
-/*Revisar firmas_metodos*/
+/*Firmas de los metodos en caso de que el fichero a analizar sea una clase*/
 firmas_metodos: firmas_metodos m_visibilidad STRING STRING '(' parametros ')' ';' {met[numMetodo] = crearMetodo($4,$3,$2);
 																											  numMetodo++;
 																											  numParametro=0;
@@ -221,6 +228,8 @@ int main(){
 		/*Abrir fichero .java y asignarselo a la entrada del analizador*/
 		f = fopen(pathArchivos[i],"r");
 		yyin= f;
+		
+		/*Contabilizador de errores*/
 		errorYparse += yyparse();
 		errorParseando = errorParseando + errorYparse;
 		
@@ -245,7 +254,6 @@ int main(){
 		i++;
 		fclose(f);
 	}
-	//printf("\nError------->%d\n",errorParseando);
 	if(errorParseando==1){
 		printf("%d de %d ficheros analizados\n",numClases,numTotalClases);
 	
@@ -277,6 +285,8 @@ void yyerror (char const *message) {
 		printf ("\n-Error en %c%s%c: %s\n",'"',c->nombre,'"',message);
 	}
 }
+
+/*Funcion que contabiliza el numero de errores*/
 void sumarError(){
 	errorParseando++;
 }
