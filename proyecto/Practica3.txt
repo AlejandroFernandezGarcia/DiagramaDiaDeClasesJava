@@ -45,6 +45,10 @@ siguientes:
 No se si faltaría alguno pero esos son los errores básicos que getiono 
 en la gramática.
 
+Para lo errores se mostrará:
+	- La clase en la que se ha dado el error.
+	- La descripción del error.
+
 
 ----------------
 Funcionamiento -
@@ -93,7 +97,8 @@ Los pasos que realiza la practica en una ejecución son los siguientes:
 NOTA: Se utiliza la función system que permite ejecutar comandos del sistema operativo, en este 
 		caso la use para crear y borrar la carpeta temporal donde iran los XML temporales. 
 		No creo que de algún problema con algun tipo de linux.
-
-
+NOTA2: Al abrir el XML con el DIA lo más probable es que las flechas no acaben donde deberían acabar y se 
+		 solapen con las clases pero las flechas relacionan las clases correctamente, es decir, no queda 
+		 "bonito".
 
 
