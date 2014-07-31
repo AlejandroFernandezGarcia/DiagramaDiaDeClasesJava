@@ -53,20 +53,20 @@ Funcionamiento -
 ----------------
 
 Para que sea fácil y rapido de ejecutar he puesto un Makefile con las siguientes ordenes:
-	- make -> compila
-	- make run -> compila y ejecuta
-	- make testN -> compila y ejecuta el test N
-	- make clean -> limpia el directorio base
+ - make -> compila
+ - make run -> compila y ejecuta
+ - make testN -> compila y ejecuta el test N
+ - make clean -> limpia el directorio base
 	
 En total he puesto 8 ejemplos:
-	- Del 1 al 3, 8: Ejemplos de un correcto funcionamiento.
-	- Del 4 al 7: Ejemplos de tratamiento de errores.
+ - Del 1 al 3, 8: Ejemplos de un correcto funcionamiento.
+ - Del 4 al 7: Ejemplos de tratamiento de errores.
 
 
 Si se realiza una ejecución normal el programa pedirá:
-	- El directorio donde buscar las clases JAVA.
-	- El nombre del fichero DIA que será el resultado de la ejecución.
-	- El directorio donde se va a guardar el resultado.
+ - El directorio donde buscar las clases JAVA.
+ - El nombre del fichero DIA que será el resultado de la ejecución.
+ - El directorio donde se va a guardar el resultado.
 	
 
 
